@@ -1,0 +1,45 @@
+from django.db import models
+from django.contrib.auth.models import User
+
+# App: schedule
+class Faculty(models.Model):
+    name = models.CharField(max_length=255)
+
+class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='student_images/', blank=True, null=True)
+    registration_number = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
+
+class Course(models.Model):
+    name = models.CharField(max_length=255)
+    professor = models.CharField(max_length=255)
+    total_hours = models.FloatField()
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
+    finished = models.BooleanField(default=False)
+
+class CourseSchedule(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    day_of_week = models.CharField(max_length=10, choices=[
+        ('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'),
+        ('Thursday', 'Thursday'), ('Friday', 'Friday'), ('Saturday', 'Saturday'),
+        ('Sunday', 'Sunday')
+    ])
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+class Exam(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    semester = models.CharField(max_length=255)
+    date = models.DateTimeField()
+    location = models.CharField(max_length=255)
+
+class Work(models.Model):
+    title = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
+    description = models.TextField()
+    due_date = models.DateTimeField()
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    submitted = models.BooleanField(default=False)
+    file = models.FileField(upload_to='assignments/', blank=True, null=True)
+    
