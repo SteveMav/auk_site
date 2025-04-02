@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 # App: schedule
 class Faculty(models.Model):
     name = models.CharField(max_length=255)
+    level = models.CharField(max_length=255, null=True, blank=True)
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
