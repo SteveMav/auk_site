@@ -1,1 +1,12 @@
 <h1> bienvenue sur le site de l'auk</h1>
+
+
+{% if user.is_authenticated %}
+    <p>Connected as {{ user.username }}</p>
+    <a href="{% url 'accounts:deconnect' %}">Logout</a>
+{% else %}
+    <a href="{% url 'accounts:login' %}">Login</a>
+    <a href="{% url 'accounts:register' %}">Register</a>
+{% endif %}
+</body>
+</html>

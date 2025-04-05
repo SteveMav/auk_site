@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'event_news',
     'task',
     'main',
+    'accounts',
 ]
 
 MIDDLEWARE = [
