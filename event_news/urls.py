@@ -4,5 +4,5 @@ from . import views
 app_name = 'event_news'
 
 urlpatterns = [
-    #path('', views.index, name='index'),
+    path('add/', views.add_content, name='add_content'),
 ]

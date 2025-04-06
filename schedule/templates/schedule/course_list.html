@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Liste des cours</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+    <h2 class="mb-4">Liste des cours et horaires</h2>
+
+    {% for course in courses %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ course.name }} ({{ course.professor }})</h5>
+                <p class="card-text">
+                    <strong>Faculté:</strong> {{ course.faculty.name }}<br>
+                    <strong>Heures totales:</strong> {{ course.total_hours }}<br>
+                    <strong>Status:</strong> {{ course.finished|yesno:"Terminé,En cours" }}
+                </p>
+                <h6>Horaires:</h6>
+                <ul>
+                    {% for schedule in course.courseschedule_set.all %}
+                        <li>{{ schedule.day_of_week }} : {{ schedule.start_time }} - {{ schedule.end_time }}</li>
+                    {% empty %}
+                        <li>Aucun horaire défini</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endfor %}
+</body>
+</html>
