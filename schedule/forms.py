@@ -1,17 +1,5 @@
 from django import forms
-from .models import Course, CourseSchedule
-
-class CourseForm(forms.ModelForm):
-    class Meta:
-        model = Course
-        fields = ['name', 'professor', 'total_hours', 'faculty', 'finished']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'professor': forms.TextInput(attrs={'class': 'form-control'}),
-            'total_hours': forms.NumberInput(attrs={'class': 'form-control'}),
-            'faculty': forms.Select(attrs={'class': 'form-control'}),
-            'finished': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }
+from .models import Course, Faculty
 
 DAYS_OF_WEEK = [
     ('Monday', 'Lundi'),
@@ -23,12 +11,14 @@ DAYS_OF_WEEK = [
     ('Sunday', 'Dimanche'),
 ]
 
-class MultiScheduleForm(forms.Form):
-    course = forms.ModelChoiceField(queryset=Course.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-    days = forms.MultipleChoiceField(
-        choices=DAYS_OF_WEEK,
-        widget=forms.CheckboxSelectMultiple(),
-        label="Jours de la semaine"
-    )
-    start_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}))
-    end_time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}))
+class CourseWithScheduleForm(forms.Form):
+    name = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    professor = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    total_hours = forms.FloatField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    faculty = forms.ModelChoiceField(queryset=Faculty.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+    finished = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+
+    # Champs horaires par jour
+    for day, label in DAYS_OF_WEEK:
+        locals()[f'{day}_start'] = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}), label=f"{label} - Début")
+        locals()[f'{day}_end'] = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}), label=f"{label} - Fin")

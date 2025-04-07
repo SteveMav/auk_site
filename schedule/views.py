@@ -1,38 +1,35 @@
 from django.shortcuts import render, redirect
-from .forms import CourseForm, MultiScheduleForm
+from .forms import CourseWithScheduleForm
 from .models import Course, CourseSchedule
 
-def create_course(request):
+def create_course_with_schedule(request):
+    days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    
     if request.method == 'POST':
-        form = CourseForm(request.POST)
+        form = CourseWithScheduleForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('schedule:course_list')
-    else:
-        form = CourseForm()
-    return render(request, 'schedule/create_course.html', {'form': form})
-
-def create_schedule(request):
-    if request.method == 'POST':
-        form = MultiScheduleForm(request.POST)
-        if form.is_valid():
-            course = form.cleaned_data['course']
-            days = form.cleaned_data['days']
-            start_time = form.cleaned_data['start_time']
-            end_time = form.cleaned_data['end_time']
-
-            # Crée un CourseSchedule pour chaque jour sélectionné
+            course = Course.objects.create(
+                name=form.cleaned_data['name'],
+                professor=form.cleaned_data['professor'],
+                total_hours=form.cleaned_data['total_hours'],
+                faculty=form.cleaned_data['faculty'],
+                finished=form.cleaned_data['finished']
+            )
             for day in days:
-                CourseSchedule.objects.create(
-                    course=course,
-                    day_of_week=day,
-                    start_time=start_time,
-                    end_time=end_time
-                )
+                start = form.cleaned_data.get(f'{day}_start')
+                end = form.cleaned_data.get(f'{day}_end')
+                if start and end:
+                    CourseSchedule.objects.create(
+                        course=course,
+                        day_of_week=day,
+                        start_time=start,
+                        end_time=end
+                    )
             return redirect('schedule:course_list')
     else:
-        form = MultiScheduleForm()
-    return render(request, 'schedule/create_schedule.html', {'form': form})
+        form = CourseWithScheduleForm()
+
+    return render(request, 'schedule/create_course.html', {'form': form, 'days': days})
 
 
 
