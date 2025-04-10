@@ -1,24 +1,39 @@
 from django import forms
-from .models import Course, Faculty
+from .models import Course
 
-DAYS_OF_WEEK = [
-    ('Monday', 'Lundi'),
-    ('Tuesday', 'Mardi'),
-    ('Wednesday', 'Mercredi'),
-    ('Thursday', 'Jeudi'),
-    ('Friday', 'Vendredi'),
-    ('Saturday', 'Samedi'),
-    ('Sunday', 'Dimanche'),
-]
+# DAYS_OF_WEEK = [
+#     ('Monday', 'Lundi'),
+#     ('Tuesday', 'Mardi'),
+#     ('Wednesday', 'Mercredi'),
+#     ('Thursday', 'Jeudi'),
+#     ('Friday', 'Vendredi'),
+#     ('Saturday', 'Samedi'),
+#     ('Sunday', 'Dimanche'),
+# ]
 
-class CourseWithScheduleForm(forms.Form):
-    name = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    professor = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    total_hours = forms.FloatField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    faculty = forms.ModelChoiceField(queryset=Faculty.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-    finished = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+# TIME_BLOCKS = [
+#     ('morning', 'Matin (8h-12h)'),
+#     ('afternoon', 'Après-midi (14h-18h)'),
+#     ('both', 'Les deux'),
+# ]
 
-    # Champs horaires par jour
-    for day, label in DAYS_OF_WEEK:
-        locals()[f'{day}_start'] = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}), label=f"{label} - Début")
-        locals()[f'{day}_end'] = forms.TimeField(required=False, widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}), label=f"{label} - Fin")
+# class CourseForm(forms.ModelForm):
+#     days = forms.MultipleChoiceField(
+#         choices=DAYS_OF_WEEK,
+#         widget=forms.CheckboxSelectMultiple,
+#         label="Jours de cours"
+#     )
+#     schedule = forms.MultipleChoiceField(
+#         choices=TIME_BLOCKS,
+#         widget=forms.CheckboxSelectMultiple,
+#         label="Créneau horaire"
+#     )
+
+#     class Meta:
+#         model = Course
+#         fields = ['name', 'professor', 'total_hours', 'faculty', 'finished']
+
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['name', 'professor', 'total_hours', 'faculty', 'finished']
