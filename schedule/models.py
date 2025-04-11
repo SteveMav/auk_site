@@ -9,6 +9,13 @@ class Faculty(models.Model):
     def __str__(self):
         return self.name
 
+class CPProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"CP: {self.user.username} - {self.faculty.name}"
+
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='student_images/', blank=True, null=True)
