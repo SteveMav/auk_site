@@ -52,15 +52,46 @@ def create_course(request):
 
 @login_required
 def course_list(request):
-    #when user is superuser, show all courses
+    # Dictionnaire de traduction des jours
+    day_translation = {
+        'Monday': 'Lundi',
+        'Tuesday': 'Mardi',
+        'Wednesday': 'Mercredi',
+        'Thursday': 'Jeudi',
+        'Friday': 'Vendredi',
+        'Saturday': 'Samedi',
+        'Sunday': 'Dimanche'
+    }
+    
+    days_of_week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+    
+    # Get courses based on user role
     if request.user.is_superuser:
         courses = Course.objects.prefetch_related('courseschedule_set')
     elif not request.user.is_staff:
         courses = Course.objects.filter(faculty__userprofile__user=request.user).prefetch_related('courseschedule_set')
-    #when user is cp, view only courses of their faculty
     else:
         cp_profile = CPProfile.objects.get(user=request.user)
         courses = Course.objects.filter(faculty=cp_profile.faculty).prefetch_related('courseschedule_set')
-    return render(request, 'schedule/course_list.html', {'courses': courses})
+    
+    # Organize courses by day
+    courses_by_day = {day: [] for day in days_of_week}
+    
+    for course in courses:
+        for schedule in course.courseschedule_set.all():
+            # Traduire le jour de l'anglais vers le français
+            french_day = day_translation.get(schedule.day_of_week)
+            if french_day:
+                courses_by_day[french_day].append({
+                    'course': course,
+                    'schedule': schedule
+                })
+    
+    context = {
+        'days_of_week': days_of_week,
+        'courses_by_day': courses_by_day
+    }
+    
+    return render(request, 'schedule/course_list.html', context)
 
 

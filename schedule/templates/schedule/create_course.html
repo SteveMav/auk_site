@@ -27,6 +27,17 @@
                 delete scheduleData[day];
             }
             document.getElementById('schedulesInput').value = JSON.stringify(scheduleData);
+            displaySchedules();
+        }
+
+        function displaySchedules() {
+            const schedulesElement = document.getElementById('schedules');
+            const schedules = JSON.parse(document.getElementById('schedulesInput').value);
+            let html = '';
+            Object.keys(schedules).forEach(day => {
+                html += `<p>${day} : ${schedules[day].join(', ')}</p>`;
+            });
+            schedulesElement.innerHTML = html;
         }
     </script>
 </head>
@@ -58,7 +69,8 @@
         <input type="hidden" name="schedules" id="schedulesInput">
 
         <hr>
-        <button type="submit" class="btn btn-success" onclick="saveModalSchedule()">Enregistrer</button>
+        <div id="schedules"></div>
+        <button type="submit" class="btn btn-success" onclick="displaySchedules()">Enregistrer</button>
     </form>
 
     <!-- Modal Bootstrap -->
