@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import NewsForm, EventForm
+from .models import News, Event
 
 # Create your views here.
 
@@ -38,3 +39,8 @@ def add_content(request):
         'event_form': event_form
     }
     return render(request, 'event_news/add_content.html', context)
+
+
+def views_news(request):
+    news = News.objects.all()
+    return render(request, 'event_news/news.html', {'news': news})

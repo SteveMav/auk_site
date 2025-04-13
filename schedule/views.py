@@ -1,3 +1,4 @@
+from django.contrib.auth.forms import User
 from django.shortcuts import render, redirect
 from .forms import CourseForm
 from .models import Course, CourseSchedule
@@ -11,7 +12,12 @@ import json
 @permission_required('schedule.add_course')
 def create_course(request):
     days = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
-    cp_profile = CPProfile.objects.get(user=request.user)
+    cp_profile = None
+
+    if request.user.is_superuser:
+        cp_profile = None
+    else:
+        cp_profile = CPProfile.objects.get(user=request.user)
 
     if request.method == 'POST':
         form = CourseForm(request.POST)
@@ -19,7 +25,7 @@ def create_course(request):
             course = form.save(commit=False)
 
             # Empêcher la création pour une autre faculté
-            if course.faculty != cp_profile.faculty:
+            if not request.user.is_superuser and course.faculty != cp_profile.faculty:
                 return HttpResponseForbidden("Vous ne pouvez créer un cours que pour votre propre faculté.")
 
             course.save()
@@ -37,7 +43,8 @@ def create_course(request):
         form = CourseForm()
 
         # Restreindre la faculté dans le formulaire (juste celle du CP)
-        form.fields['faculty'].queryset = form.fields['faculty'].queryset.filter(id=cp_profile.faculty.id)
+        if cp_profile:
+            form.fields['faculty'].queryset = form.fields['faculty'].queryset.filter(id=cp_profile.faculty.id)
 
     return render(request, 'schedule/create_course.html', {'form': form, 'days': days})
 
@@ -45,5 +52,15 @@ def create_course(request):
 
 @login_required
 def course_list(request):
-    courses = Course.objects.all().prefetch_related('courseschedule_set')
+    #when user is superuser, show all courses
+    if request.user.is_superuser:
+        courses = Course.objects.prefetch_related('courseschedule_set')
+    elif not request.user.is_staff:
+        courses = Course.objects.filter(faculty__userprofile__user=request.user).prefetch_related('courseschedule_set')
+    #when user is cp, view only courses of their faculty
+    else:
+        cp_profile = CPProfile.objects.get(user=request.user)
+        courses = Course.objects.filter(faculty=cp_profile.faculty).prefetch_related('courseschedule_set')
     return render(request, 'schedule/course_list.html', {'courses': courses})
+
+
