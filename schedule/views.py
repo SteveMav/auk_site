@@ -1,6 +1,8 @@
 from django.contrib.auth.forms import User
 from django.shortcuts import render, redirect
-from .forms import CourseForm
+from django.http import HttpResponseForbidden
+from django.contrib import messages
+from .forms import CourseForm, CourseScheduleForm
 from .models import Course, CourseSchedule
 from .models import CPProfile
 from django.contrib.auth.decorators import login_required, permission_required
@@ -30,13 +32,42 @@ def create_course(request):
 
             course.save()
 
-            # Création des horaires
+            # Création des horaires avec validation
             schedule_data = json.loads(request.POST.get('schedules', '{}'))
+            schedule_creation_failed = False
+
             for day, blocks in schedule_data.items():
+                schedules_to_create = []
                 if 'morning' in blocks:
-                    CourseSchedule.objects.create(course=course, day_of_week=day, start_time='08:00', end_time='12:00')
+                    schedules_to_create.append({
+                        'day_of_week': day,
+                        'start_time': '08:00',
+                        'end_time': '12:00'
+                    })
                 if 'afternoon' in blocks:
-                    CourseSchedule.objects.create(course=course, day_of_week=day, start_time='14:00', end_time='18:00')
+                    schedules_to_create.append({
+                        'day_of_week': day,
+                        'start_time': '14:00',
+                        'end_time': '18:00'
+                    })
+
+                for schedule_data in schedules_to_create:
+                    schedule_form = CourseScheduleForm({
+                        'course': course.id,
+                        **schedule_data
+                    })
+                    
+                    if schedule_form.is_valid():
+                        schedule_form.save()
+                    else:
+                        schedule_creation_failed = True
+                        error_messages = [f"{error}" for error in schedule_form.errors.values()]
+                        messages.error(request, f"Erreur lors de la création de l'horaire pour {day}: {' '.join(error_messages)}")
+
+            if schedule_creation_failed:
+                # Si la création d'horaire a échoué, supprimer le cours
+                course.delete()
+                return render(request, 'schedule/create_course.html', {'form': form, 'days': days})
 
             return redirect('schedule:course_list')
     else:
@@ -95,3 +126,33 @@ def course_list(request):
     return render(request, 'schedule/course_list.html', context)
 
 
+
+@login_required
+@permission_required('schedule.change_courseschedule')
+def edit_schedule(request, schedule_id):
+    schedule = CourseSchedule.objects.get(id=schedule_id)
+    course = schedule.course
+
+    # Vérifier que l'utilisateur a le droit de modifier cet horaire
+    if not request.user.is_superuser:
+        try:
+            cp_profile = CPProfile.objects.get(user=request.user)
+            if course.faculty != cp_profile.faculty:
+                return HttpResponseForbidden("Vous ne pouvez modifier que les horaires de votre faculté.")
+        except CPProfile.DoesNotExist:
+            return HttpResponseForbidden("Accès non autorisé.")
+
+    if request.method == 'POST':
+        form = CourseScheduleForm(request.POST, instance=schedule)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Horaire modifié avec succès.')
+            return redirect('schedule:course_list')
+    else:
+        form = CourseScheduleForm(instance=schedule)
+
+    return render(request, 'schedule/edit_schedule.html', {
+        'form': form,
+        'schedule': schedule,
+        'course': course
+    })

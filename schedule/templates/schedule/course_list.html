@@ -24,6 +24,13 @@
                                 <strong>Faculté:</strong> {{ item.course.faculty.name }}<br>
                                 <strong>Horaire:</strong> {{ item.schedule.start_time }} - {{ item.schedule.end_time }}<br>
                                 <strong>Status:</strong> {{ item.course.finished|yesno:"Terminé,En cours" }}
+                                {% if perms.schedule.change_courseschedule %}
+                                <div class="mt-2">
+                                    <a href="{% url 'schedule:edit_schedule' item.schedule.id %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-pencil"></i> Modifier l'horaire
+                                    </a>
+                                </div>
+                                {% endif %}
                             </p>
                         </div>
                     {% endfor %}
