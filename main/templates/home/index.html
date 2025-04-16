@@ -73,13 +73,13 @@
             <p>Aucun cours prévu pour aujourd'hui.</p>
         {% endif %}
 
-        <h2 class="section-title">Dernières actualités ({{ debug_news_count }} au total)</h2>
         {% if latest_news %}
+            <h2 class="section-title">Dernières actualités</h2>
             {% for news in latest_news %}
                 <div class="news-item">
                     <h3>{{ news.title }}</h3>
                     <div class="news-date">{{ news.date_posted|date:"d F Y" }}</div>
-                    <div class="news-content">{{ news.content|linebreaks }}</div>
+                    <pre><div class="news-content">{{ news.content|linebreaks|safe }}</div></pre>
                     {% if news.image %}
                         <img src="{{ news.image.url }}" alt="{{ news.title }}" class="news-image">
                     {% endif %}

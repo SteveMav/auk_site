@@ -49,9 +49,8 @@ def index(request):
     # Debug: afficher toutes les news
     all_news = News.objects.all()
     
-    latest_news = all_news[:1]  # Get the 2 most recent news
+    latest_news = all_news[:2]  # Get the 2 most recent news
     return render(request, 'home/index.html', {
         'course_info': course_info,
         'latest_news': latest_news,
-        'debug_news_count': all_news.count()
     })
