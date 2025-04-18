@@ -157,22 +157,25 @@ def edit_schedule(request, schedule_id):
         'course': course
     })
 
+
 @login_required
 def create_work(request):
-    # Vérifier si l'utilisateur est un CP
-    if not hasattr(request.user, 'cpprofile'):
-        return HttpResponseForbidden("Seuls les CP peuvent créer des TP.")
+    # Vérifier si l'utilisateur est un CP ou un superuser
+    if not hasattr(request.user, 'cpprofile') and not request.user.is_superuser:
+        return HttpResponseForbidden("Seuls les CP et les superusers peuvent créer des TP.")
 
     if request.method == 'POST':
-        form = WorkForm(request.POST, request.FILES, faculty=request.user.cpprofile.faculty)
+        form = WorkForm(request.POST, request.FILES, faculty=request.user.cpprofile.faculty if hasattr(request.user, 'cpprofile') else None)
         if form.is_valid():
             work = form.save()
             messages.success(request, 'Le TP a été créé avec succès.')
             return redirect('schedule:work_list')
     else:
-        form = WorkForm(faculty=request.user.cpprofile.faculty)
+        form = WorkForm(faculty=request.user.cpprofile.faculty if hasattr(request.user, 'cpprofile') else None)
     
     return render(request, 'schedule/create_work.html', {'form': form})
+
+
 
 @login_required
 def work_list(request):
