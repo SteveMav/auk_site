@@ -1,11 +1,11 @@
 from django.contrib.auth.forms import User
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
 from django.contrib import messages
-from .forms import CourseForm, CourseScheduleForm
-from .models import Course, CourseSchedule
-from .models import CPProfile
 from django.contrib.auth.decorators import login_required, permission_required
+from django.utils import timezone
+from .models import Course, CourseSchedule, Work, CPProfile
+from .forms import CourseForm, CourseScheduleForm, WorkForm
 import json
 
 
@@ -156,3 +156,39 @@ def edit_schedule(request, schedule_id):
         'schedule': schedule,
         'course': course
     })
+
+@login_required
+def create_work(request):
+    # Vérifier si l'utilisateur est un CP
+    if not hasattr(request.user, 'cpprofile'):
+        return HttpResponseForbidden("Seuls les CP peuvent créer des TP.")
+
+    if request.method == 'POST':
+        form = WorkForm(request.POST, request.FILES, faculty=request.user.cpprofile.faculty)
+        if form.is_valid():
+            work = form.save()
+            messages.success(request, 'Le TP a été créé avec succès.')
+            return redirect('schedule:work_list')
+    else:
+        form = WorkForm(faculty=request.user.cpprofile.faculty)
+    
+    return render(request, 'schedule/create_work.html', {'form': form})
+
+@login_required
+def work_list(request):
+    # Si c'est un CP, montrer les TPs de sa faculté
+    if hasattr(request.user, 'cpprofile'):
+        works = Work.objects.filter(
+            course__faculty=request.user.cpprofile.faculty,
+            due_date__gte=timezone.now()
+        ).order_by('due_date')
+    # Si c'est un étudiant, montrer les TPs de sa faculté
+    elif hasattr(request.user, 'student'):
+        works = Work.objects.filter(
+            course__faculty=request.user.student.faculty,
+            due_date__gte=timezone.now()
+        ).order_by('due_date')
+    else:
+        works = []
+    
+    return render(request, 'schedule/work_list.html', {'works': works})

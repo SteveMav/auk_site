@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Course, CourseSchedule
+from .models import Course, CourseSchedule, Work
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -52,3 +52,17 @@ class CourseScheduleForm(forms.ModelForm):
                 )
 
         return cleaned_data
+
+class WorkForm(forms.ModelForm):
+    class Meta:
+        model = Work
+        fields = ['title', 'type', 'description', 'due_date', 'course', 'file']
+        widgets = {
+            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'description': forms.Textarea(attrs={'rows': 4}),
+        }
+
+    def __init__(self, *args, faculty=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if faculty:
+            self.fields['course'].queryset = Course.objects.filter(faculty=faculty, finished=False)
