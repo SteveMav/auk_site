@@ -32,7 +32,7 @@ def register(request):
             # Préparer et envoyer l'email
             subject = 'Code de confirmation - Inscription'
             message = render_to_string('accounts/confirmation_email.html', {
-                'email': email,
+                'last_name': pending.last_name,
                 'confirmation_code': pending.confirmation_code,
             })
 
