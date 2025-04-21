@@ -44,3 +44,9 @@ def add_content(request):
 def views_news(request):
     news = News.objects.all()
     return render(request, 'event_news/news.html', {'news': news})
+
+from django.shortcuts import get_object_or_404
+
+def news_detail(request, news_id):
+    news = get_object_or_404(News, id=news_id)
+    return render(request, 'event_news/news_detail.html', {'news': news})

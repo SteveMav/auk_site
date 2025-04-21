@@ -149,15 +149,22 @@ def login_user(request):
         form = LoginForm(request.POST)
 
         if form.is_valid():
-            email = form.cleaned_data.get('email')
+            username_or_email = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=email, password=password)
+            user = authenticate(request, username=username_or_email, password=password)
+            if user is None:
+                # Essayer de trouver l'utilisateur par email
+                try:
+                    user_obj = User.objects.get(email=username_or_email)
+                    user = authenticate(request, username=user_obj.username, password=password)
+                except User.DoesNotExist:
+                    user = None
             if user is not None:
                 login(request, user)
-                messages.success(request, 'Login successful!')
+                messages.success(request, 'Connexion réussie !')
                 return redirect('main:index')
             else:
-                messages.error(request, 'Invalid email or password.')
+                messages.error(request, 'Nom d\'utilisateur/email ou mot de passe invalide.')
 
     return render(request, 'accounts/login.html', {'form': form})
 
@@ -179,5 +186,4 @@ def edit_profile(request):
 
 def deconnect(request):
     logout(request)
-    messages.success(request, 'You have been logged out successfully!')
     return redirect('main:index')

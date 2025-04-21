@@ -1,8 +1,48 @@
-<h1>Login</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-</form>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - AUK</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="{% static 'css/auk_style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/core.css' %}">
+</head>
+<body>
+{% include 'navbar.html' %}
+{% comment %} <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="/">AUK</a>
+    </div>
+</nav> {% endcomment %}
+<div class="container">
+    <div class="us-ribbon"></div>
+    <div class="login-box animate__animated animate__fadeInDown">
+        <div class="login-title">Connexion</div>
+        <form method="post" autocomplete="off">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="mb-3">
+                <label for="id_username" class="form-label">Nom d'utilisateur ou email</label>
+                {{ form.username }}
+                {{ form.username.errors }}
+            </div>
+            <div class="mb-3">
+                <label for="id_password" class="form-label">Mot de passe</label>
+                {{ form.password }}
+                {{ form.password.errors }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+        </form>
+        <div class="text-center mt-3">
+            <a href="{% url 'accounts:register' %}" class="text-link">Pas encore de compte ? S'inscrire</a>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% include 'footer.html' %}
 </body>
 </html>

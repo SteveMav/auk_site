@@ -1,0 +1,90 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background:#002868;">
+    <div class="container">
+        <a class="navbar-brand" href="/"><img src="{% static 'img/logo-auk.png' %}" alt="AUK Logo" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover;"> AUK</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
+                
+                
+                {% if perms.schedule.add_course %}
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Horaires
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/schedule/">Voir les horaires</a></li>
+                        <li><a class="dropdown-item" href="{% url 'schedule:create_course' %}">Ajouter un cours</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="/schedule/">Horaires</a></li>
+                {% endif %}
+                <li class="nav-item"><a class="nav-link" href="/schedule/course/">Tous les cours</a></li>
+                <li class="nav-item"><a class="nav-link" href="/event_news/">News</a></li>
+                {% if user.is_authenticated %}
+                {% if perms.schedule.add_work %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        TP/TD
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="/schedule/works/">Voir les TP/TD</a></li>
+                        <li><a class="dropdown-item" href="{% url 'schedule:create_work' %}">Ajouter un TP/TD</a></li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="/schedule/works/">TP/TD</a></li>
+                {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="/accounts/edit-profile/">Mon profil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/accounts/logout/">Déconnexion</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="/accounts/login/">Connexion</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/accounts/register/">Inscription</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<style>
+    .navbar {
+        background: #002868 !important;
+    }
+    .navbar .nav-link, .navbar .navbar-brand {
+        color: #fff !important;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        transition: color 0.2s, background 0.2s;
+    }
+    .navbar .nav-link:hover, .navbar .nav-link.active {
+        color: #002868 !important;
+        background: #fff !important;
+        border-radius: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0,40,104,0.07);
+    }
+    .navbar .dropdown-menu {
+        background: #002868;
+        border-radius: 1rem;
+        border: none;
+        min-width: 180px;
+        box-shadow: 0 2px 12px rgba(0,40,104,0.07);
+    }
+    .navbar .dropdown-item {
+        color: #fff;
+        transition: background 0.2s, color 0.2s;
+        border-radius: 0.75rem;
+        font-weight: 500;
+    }
+    .navbar .dropdown-item:hover, .navbar .dropdown-item:focus {
+        background: #fff;
+        color: #002868;
+    }
+    .navbar .nav-link, .navbar .dropdown-toggle {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+</style>

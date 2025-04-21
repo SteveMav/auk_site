@@ -20,6 +20,13 @@ class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ['name', 'professor', 'total_hours', 'faculty', 'finished']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom du cours'}),
+            'professor': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Professeur'}),
+            'total_hours': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Heures totales'}),
+            'faculty': forms.Select(attrs={'class': 'form-select'}),
+            'finished': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
 
 class CourseScheduleForm(forms.ModelForm):
     class Meta:

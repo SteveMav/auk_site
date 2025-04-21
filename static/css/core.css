@@ -1,0 +1,118 @@
+/* Styles généraux pour hero, footer, boutons, navbar, etc. */
+body {
+    background: linear-gradient(135deg, #002868 0%, #ffffff 50%, #bf0a30 100%);
+    min-height: 100vh;
+}
+.navbar {
+    background: #002868;
+}
+.navbar-brand, .nav-link, .navbar-nav .nav-link.active {
+    color: #fff !important;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+.navbar-nav .nav-link:hover {
+    color: #bf0a30 !important;
+    transition: color .3s;
+}
+.hero {
+    background: rgba(255,255,255,0.95);
+    border-radius: 1rem;
+    box-shadow: 0 6px 36px rgba(0,0,0,0.07);
+    margin-top: 2rem;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    animation: fadeInDown 1s;
+}
+.hero-title {
+    color: #002868;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+.hero-subtitle {
+    color: #bf0a30;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+.us-ribbon {
+    background: repeating-linear-gradient(90deg, #bf0a30, #bf0a30 10px, #fff 10px, #fff 20px, #002868 20px, #002868 30px);
+    height: 6px;
+    border-radius: 3px;
+    margin: 0 auto 1.5rem auto;
+    width: 120px;
+}
+.footer {
+    background: #002868;
+    color: #fff;
+    padding: 2rem 0 1rem 0;
+    margin-top: 3rem;
+    border-top: 4px solid #bf0a30;
+}
+.footer a {
+    color: #fff;
+    margin: 0 .5rem;
+    font-size: 1.3rem;
+}
+.footer a:hover {
+    color: #bf0a30;
+}
+.btn-primary {
+    background: #bf0a30;
+    border: none;
+}
+.btn-primary:hover {
+    background: #002868;
+}
+.text-link { color: #bf0a30; text-decoration: underline; }
+.text-link:hover { color: #002868; }
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* Styles pour les blocs cours/news de la page d'accueil */
+.course-info, .news-item {
+    margin: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+}
+.current-course {
+    border-left: 4px solid #4CAF50;
+}
+.next-course {
+    border-left: 4px solid #2196F3;
+}
+.news-item {
+    border-left: 4px solid #FF9800;
+}
+.course-status {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.current-course .course-status {
+    color: #4CAF50;
+}
+.next-course .course-status {
+    color: #2196F3;
+}
+.news-date {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+.news-content {
+    margin-top: 10px;
+}
+.news-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+.section-title {
+    margin: 20px;
+    color: #333;
+    border-bottom: 2px solid #FF9800;
+    padding-bottom: 5px;
+}

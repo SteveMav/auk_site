@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, JsonResponse
+from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
@@ -246,7 +247,8 @@ def work_list(request):
             due_date__gte=timezone.now()
         ).order_by('due_date')
     else:
-        works = []
+        # Afficher tous les TP à venir pour les autres utilisateurs
+        works = Work.objects.filter(due_date__gte=timezone.now()).order_by('due_date')
     
     return render(request, 'schedule/work_list.html', {'works': works})
 
@@ -255,6 +257,7 @@ def work_list(request):
 def all_courses_view(request):
     courses = Course.objects.all().prefetch_related('files', 'faculty')
     return render(request, 'schedule/all_courses.html', {'courses': courses})
+
 
 
 @login_required

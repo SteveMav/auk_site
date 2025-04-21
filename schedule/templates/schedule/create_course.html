@@ -1,8 +1,46 @@
-<!DOCTYPE html>
-<html>
+{% load static %}
+<html lang="fr">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Créer un cours</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #002868 0%, #ffffff 50%, #bf0a30 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #002868;
+        }
+        .navbar-brand, .nav-link, .navbar-nav .nav-link.active {
+            color: #fff !important;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #bf0a30 !important;
+            transition: color .3s;
+        }
+        .main-content {
+            background: rgba(255,255,255,0.97);
+            border-radius: 1rem;
+            box-shadow: 0 6px 36px rgba(0,0,0,0.07);
+            margin-top: 2rem;
+            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+            max-width: 700px;
+        }
+        footer {
+            background: #002868;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+            margin-top: 3rem;
+            border-radius: 1rem 1rem 0 0;
+            font-size: 1rem;
+        }
+    </style>
     <script>
         const scheduleData = {};  // stocke les horaires par jour
 
@@ -42,20 +80,61 @@
     </script>
 </head>
 
-<body class="container mt-5">
-    <h2>Créer un cours</h2>
+<body>
+{% include 'navbar.html' %}
+    <div class="container">
+        <a class="navbar-brand" href="/">AUK</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="/schedule/">Horaires</a></li>
+                <li class="nav-item"><a class="nav-link" href="/schedule/course/">Tous les cours</a></li>
+                <li class="nav-item"><a class="nav-link" href="#news">News</a></li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/profile/">Mon profil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout/">Déconnexion</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="/login/">Connexion</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/register/">Inscription</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container d-flex justify-content-center">
+<div class="main-content">
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-plus-circle-fill" style="font-size:2rem;color:#002868;margin-right:0.5rem;"></i>
+        <h2 class="mb-0">Créer un cours</h2>
+    </div>
     <form method="post">
         {% csrf_token %}
         {{ form.non_field_errors }}
-
-        <div class="mb-3">{{ form.name.label_tag }} {{ form.name }}</div>
-        <div class="mb-3">{{ form.professor.label_tag }} {{ form.professor }}</div>
-        <div class="mb-3">{{ form.total_hours.label_tag }} {{ form.total_hours }}</div>
-        <div class="mb-3">{{ form.faculty.label_tag }} {{ form.faculty }}</div>
-        <div class="mb-3">{{ form.finished }} {{ form.finished.label_tag }}</div>
-
+        <div class="mb-3 input-group">
+            <span class="input-group-text"><i class="bi bi-book"></i></span>
+            {{ form.name.label_tag }} {{ form.name }}
+        </div>
+        <div class="mb-3 input-group">
+            <span class="input-group-text"><i class="bi bi-person"></i></span>
+            {{ form.professor.label_tag }} {{ form.professor }}
+        </div>
+        <div class="mb-3 input-group">
+            <span class="input-group-text"><i class="bi bi-clock-history"></i></span>
+            {{ form.total_hours.label_tag }} {{ form.total_hours }}
+        </div>
+        <div class="mb-3 input-group">
+            <span class="input-group-text"><i class="bi bi-building"></i></span>
+            {{ form.faculty.label_tag }} {{ form.faculty }}
+        </div>
+        <div class="mb-3 form-check">
+            {{ form.finished }} {{ form.finished.label_tag }}
+        </div>
         <hr>
-        <h4>Jours & Horaires</h4>
+        <h4 class="mt-4 mb-3"><i class="bi bi-calendar-week"></i> Jours & Horaires</h4>
         <div class="row">
             {% for day in days %}
                 <div class="col-md-3 mb-2">
@@ -101,5 +180,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+</div>
+{% include 'footer.html' %}
 </body>
 </html>

@@ -1,8 +1,14 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from schedule.models import Faculty
 from .models import UserProfile
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control form-control-lg'
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
@@ -56,33 +62,25 @@ class RegistrationForm(forms.Form):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError('Les mots de passe ne correspondent pas.')
 
-        if email and User.objects.filter(username=email).exists():
-            raise forms.ValidationError('Un utilisateur avec cet email existe déjà.')
+        if email:
+            if User.objects.filter(username=email).exists() or User.objects.filter(email=email).exists():
+                raise forms.ValidationError('Un utilisateur avec cet email existe déjà.')
 
         return cleaned_data
 
 
 class LoginForm(forms.Form):
-    email = forms.EmailField(
-        required=True, 
-        label='Email', 
-        widget=forms.EmailInput(attrs={'class': 'form-control my-3', 'id': 'usernameInput'}), 
-        help_text=''
+    username = forms.CharField(
+        label="Nom d'utilisateur ou email",
+        widget=forms.TextInput(attrs={'class': 'form-control my-3', 'id': 'usernameInput'}),
+        required=True
     )
     password = forms.CharField(
-        max_length=15, 
-        required=True, 
-        label='Mot de passe', 
-        widget=forms.PasswordInput(attrs={'class': 'form-control my-3', 'id': 'passwordInput'}), 
-        help_text=''
+        max_length=128,
+        required=True,
+        label='Mot de passe',
+        widget=forms.PasswordInput(attrs={'class': 'form-control my-3', 'id': 'passwordInput'})
     )
-    
-    # Custom initialization of the login form
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['password'].widget.attrs.update({'class': 'form-control my-3', 'id': 'passwordInput'})
-        self.fields['password'].help_text = ''
-        self.fields['password'].label = 'Mot de passe'
 
 class ConfirmationCodeForm(forms.Form):
     code = forms.CharField(
@@ -91,12 +89,18 @@ class ConfirmationCodeForm(forms.Form):
         required=True,
         label='Code de confirmation',
         widget=forms.TextInput(attrs={
-            'class': 'form-control',
+            'class': 'form-control form-control-lg',
             'placeholder': 'Entrez le code à 6 chiffres',
             'pattern': '[0-9]{6}',
-            'title': 'Le code doit contenir 6 chiffres'
+            'title': 'Le code doit contenir 6 chiffres',
+            'autocomplete': 'off',
+            'aria-describedby': 'codeHelpBlock'
         })
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['code'].help_text = '<small id="codeHelpBlock" class="form-text text-muted">Entrez le code à 6 chiffres envoyé à votre adresse e-mail.</small>'
 
     def clean_code(self):
         code = self.cleaned_data['code']
