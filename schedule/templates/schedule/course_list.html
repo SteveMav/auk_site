@@ -18,20 +18,26 @@
                     <div class="list-group">
                     {% for item in courses_by_day|get_item:day %}
                         <div class="list-group-item">
-                            <h5 class="mb-1">{{ item.course.name }}</h5>
-                            <p class="mb-1">
-                                <strong>Professeur:</strong> {{ item.course.professor }}<br>
-                                <strong>Faculté:</strong> {{ item.course.faculty.name }}<br>
-                                <strong>Horaire:</strong> {{ item.schedule.start_time }} - {{ item.schedule.end_time }}<br>
-                                <strong>Status:</strong> {{ item.course.finished|yesno:"Terminé,En cours" }}
-                                {% if perms.schedule.change_courseschedule %}
-                                <div class="mt-2">
-                                    <a href="{% url 'schedule:edit_schedule' item.schedule.id %}" class="btn btn-sm btn-primary">
-                                        <i class="bi bi-pencil"></i> Modifier l'horaire
-                                    </a>
-                                </div>
-                                {% endif %}
-                            </p>
+                            <h5 class="mb-1">
+    <a href="#" data-bs-toggle="modal" data-bs-target="#modalCourseFiles{{ item.course.id }}">
+        {{ item.course.name }}
+    </a>
+</h5>
+<p class="mb-1">
+    <strong>Professeur:</strong> {{ item.course.professor }}<br>
+    <strong>Faculté:</strong> {{ item.course.faculty.name }}<br>
+    <strong>Horaire:</strong> {{ item.schedule.start_time }} - {{ item.schedule.end_time }}<br>
+    <strong>Status:</strong> {{ item.course.finished|yesno:"Terminé,En cours" }}
+    {% if perms.schedule.change_courseschedule %}
+    <div class="mt-2">
+        <a href="{% url 'schedule:edit_schedule' item.schedule.id %}" class="btn btn-sm btn-primary">
+            <i class="bi bi-pencil"></i> Modifier l'horaire
+        </a>
+        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalCourseFiles{{ item.course.id }}">Ajouter un PDF</button>
+    </div>
+    {% endif %}
+</p>
+{% include 'schedule/course_file_modal.html' with course=item.course %}
                         </div>
                     {% endfor %}
                     </div>

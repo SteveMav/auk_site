@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.urls import reverse
-from .forms import RegistrationForm, LoginForm, ConfirmationCodeForm
+from .forms import RegistrationForm, LoginForm, ConfirmationCodeForm, UserProfileForm
 from .models import PendingRegistration, UserProfile
 
 def register(request):
@@ -164,6 +164,18 @@ def login_user(request):
     
 
 
+
+def edit_profile(request):
+    user_profile = UserProfile.objects.get(user=request.user)
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profil mis à jour avec succès!')
+            return redirect('accounts:edit_profile')
+    else:
+        form = UserProfileForm(instance=user_profile)
+    return render(request, 'accounts/edit_profile.html', {'form': form, 'user_profile': user_profile})
 
 def deconnect(request):
     logout(request)

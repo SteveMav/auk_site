@@ -1,0 +1,101 @@
+{% load schedule_tags %}
+<div class="modal fade" id="modalCourseFiles{{ course.id }}" tabindex="-1" aria-labelledby="modalLabel{{ course.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalLabel{{ course.id }}">PDF du cours : {{ course.name }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group mb-3" id="file-list-{{ course.id }}">
+          {% for file in course.files.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-center" data-file-id="{{ file.id }}">
+              <span>
+                <a href="{{ file.file.url }}" download target="_blank">{{ file.file.name|basename }}</a>
+                {% if file.description %}<br><small>{{ file.description }}</small>{% endif %}
+              </span>
+              {% if perms.schedule.delete_coursefile %}
+              <button class="btn btn-danger btn-sm ms-2 delete-file-btn" data-file-id="{{ file.id }}"><i class="bi bi-trash"></i> Supprimer</button>
+              {% endif %}
+            </li>
+          {% empty %}
+            <li class="list-group-item">Aucun PDF pour ce cours.</li>
+          {% endfor %}
+        </ul>
+        {% if perms.schedule.add_coursefile %}
+        <form class="upload-file-form" method="post" enctype="multipart/form-data" data-course-id="{{ course.id }}">
+          {% csrf_token %}
+          <div class="mb-2">
+            <input type="file" name="file" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <input type="text" name="description" class="form-control" placeholder="Description (optionnelle)">
+          </div>
+          <button type="submit" class="btn btn-success">Ajouter un PDF</button>
+        </form>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- jQuery obligatoire pour le JS AJAX -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(function() {
+  // Évite la double attache du handler
+  $(document).off('submit', '.upload-file-form');
+  // Upload AJAX
+  $(document).on('submit', '.upload-file-form', function(e) {
+    console.log('SUBMIT INTERCEPTED'); // Debug
+    e.preventDefault();
+    var $form = $(this);
+    var courseId = $form.data('course-id');
+    var formData = new FormData(this);
+    // Affiche un message de chargement
+    $form.find('button[type=submit]').prop('disabled', true).text('Ajout...');
+    $.ajax({
+      url: '/schedule/course/' + courseId + '/files/ajax_upload/',
+      type: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      headers: {'X-CSRFToken': $form.find('[name=csrfmiddlewaretoken]').val()},
+      success: function(response) {
+        $('#file-list-' + courseId).html(response.file_list_html);
+        $form[0].reset();
+        $form.find('button[type=submit]').prop('disabled', false).text('Ajouter un PDF');
+        $form.find('.upload-error').remove();
+      },
+      error: function(xhr) {
+        var msg = 'Erreur lors de l\'upload.';
+        if (xhr.responseJSON && xhr.responseJSON.error) msg = xhr.responseJSON.error;
+        $form.find('.upload-error').remove();
+        $form.append('<div class="upload-error text-danger mt-2">'+msg+'</div>');
+        $form.find('button[type=submit]').prop('disabled', false).text('Ajouter un PDF');
+      }
+    });
+  });
+  // Évite la double attache du handler
+  $(document).off('click', '.delete-file-btn');
+  // Delete AJAX
+  $(document).on('click', '.delete-file-btn', function() {
+    var fileId = $(this).data('file-id');
+    var $li = $(this).closest('li');
+    var courseId = $li.closest('.modal').attr('id').replace('modalCourseFiles', '');
+    $.ajax({
+      url: '/schedule/course/file/' + fileId + '/ajax_delete/',
+      type: 'POST',
+      headers: {'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').first().val()},
+      success: function(response) {
+        $('#file-list-' + courseId).html(response.file_list_html);
+      },
+      error: function(xhr) {
+        alert('Erreur lors de la suppression.');
+      }
+    });
+  });
+});
+</script>

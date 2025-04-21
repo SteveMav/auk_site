@@ -4,6 +4,15 @@ from django.contrib.auth.models import User
 from schedule.models import Faculty
 from .models import UserProfile
 
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['numero_matricule', 'photo', 'faculty']
+        widgets = {
+            'numero_matricule': forms.TextInput(attrs={'class': 'form-control'}),
+            'faculty': forms.Select(attrs={'class': 'form-control'}),
+        }
+
 class RegistrationForm(forms.Form):
     first_name = forms.CharField(
         max_length=30,

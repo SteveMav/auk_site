@@ -1,14 +1,62 @@
 from django.contrib.auth.forms import User
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
-from .models import Course, CourseSchedule, Work, CPProfile
-from .forms import CourseForm, CourseScheduleForm, WorkForm
+from .models import Course, CourseSchedule, Work, CPProfile, CourseFile
+from .forms import CourseForm, CourseScheduleForm, WorkForm, CourseFileForm, CourseFileMultipleForm
+from django.template.loader import render_to_string
 import json
 
 
+
+@login_required
+@permission_required('schedule.add_coursefile')
+def upload_course_files(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    if not request.user.is_superuser:
+        try:
+            cp_profile = CPProfile.objects.get(user=request.user)
+            if course.faculty != cp_profile.faculty:
+                return HttpResponseForbidden("Vous ne pouvez ajouter des fichiers que pour votre propre faculté.")
+        except CPProfile.DoesNotExist:
+            return HttpResponseForbidden("Accès non autorisé.")
+    if request.method == 'POST':
+        form = CourseFileMultipleForm(request.POST, request.FILES)
+        files = request.FILES.getlist('files')
+        description = request.POST.get('description', '')
+        if form.is_valid():
+            for file in files:
+                CourseFile.objects.create(course=course, file=file, description=description)
+            messages.success(request, 'Fichiers ajoutés avec succès.')
+            return redirect('schedule:course_files_view', course_id=course.id)
+    else:
+        form = CourseFileMultipleForm()
+    return render(request, 'schedule/upload_course_files.html', {'form': form, 'course': course})
+
+@login_required
+def delete_course_file(request, file_id):
+    file = get_object_or_404(CourseFile, id=file_id)
+    course = file.course
+    if not request.user.is_superuser:
+        try:
+            cp_profile = CPProfile.objects.get(user=request.user)
+            if course.faculty != cp_profile.faculty:
+                return HttpResponseForbidden("Vous ne pouvez supprimer que les fichiers de votre propre faculté.")
+        except CPProfile.DoesNotExist:
+            return HttpResponseForbidden("Accès non autorisé.")
+    if request.method == 'POST':
+        file.delete()
+        messages.success(request, 'Fichier supprimé avec succès.')
+        return redirect('schedule:course_files_view', course_id=course.id)
+    return render(request, 'schedule/delete_course_file.html', {'file': file, 'course': course})
+
+@login_required
+def course_files_view(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    files = course.files.all()
+    return render(request, 'schedule/course_files_view.html', {'course': course, 'files': files})
 
 @login_required
 @permission_required('schedule.add_course')
@@ -22,7 +70,7 @@ def create_course(request):
         cp_profile = CPProfile.objects.get(user=request.user)
 
     if request.method == 'POST':
-        form = CourseForm(request.POST)
+        form = CourseForm(request.POST, request.FILES)
         if form.is_valid():
             course = form.save(commit=False)
 
@@ -31,6 +79,12 @@ def create_course(request):
                 return HttpResponseForbidden("Vous ne pouvez créer un cours que pour votre propre faculté.")
 
             course.save()
+
+            # Enregistrement du PDF s'il existe
+            pdf_file = form.cleaned_data.get('pdf_file')
+            if pdf_file:
+                from .models import CourseFile
+                CourseFile.objects.create(course=course, file=pdf_file, description='PDF ajouté à la création du cours')
 
             # Création des horaires avec validation
             schedule_data = json.loads(request.POST.get('schedules', '{}'))
@@ -195,3 +249,37 @@ def work_list(request):
         works = []
     
     return render(request, 'schedule/work_list.html', {'works': works})
+
+
+@login_required
+def all_courses_view(request):
+    courses = Course.objects.all().prefetch_related('files', 'faculty')
+    return render(request, 'schedule/all_courses.html', {'courses': courses})
+
+
+@login_required
+@permission_required('schedule.add_coursefile')
+def ajax_upload_course_file(request, course_id):
+    if request.method == 'POST' and request.FILES.get('file'):
+        course = get_object_or_404(Course, id=course_id)
+        file = request.FILES['file']
+        description = request.POST.get('description', '')
+        CourseFile.objects.create(course=course, file=file, description=description)
+        files = course.files.all()
+        file_list_html = render_to_string('schedule/partials/course_file_list.html', {'course': course, 'files': files, 'user': request.user, 'perms': request.user.get_all_permissions()})
+        return JsonResponse({'file_list_html': file_list_html})
+    return JsonResponse({'error': 'Erreur lors de l\'upload.'}, status=400)
+
+
+@login_required
+@permission_required('schedule.delete_coursefile')
+def ajax_delete_course_file(request, file_id):
+    if request.method == 'POST':
+        file = get_object_or_404(CourseFile, id=file_id)
+        course = file.course
+        file.delete()
+        files = course.files.all()
+        file_list_html = render_to_string('schedule/partials/course_file_list.html', {'course': course, 'files': files, 'user': request.user, 'perms': request.user.get_all_permissions()})
+        return JsonResponse({'file_list_html': file_list_html})
+    return JsonResponse({'error': 'Erreur lors de la suppression.'}, status=400)
+

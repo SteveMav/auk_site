@@ -1,0 +1,30 @@
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Modifier mes informations personnelles</h2>
+    <form method="post" enctype="multipart/form-data" class="mt-4">
+        {% csrf_token %}
+        <div class="mb-3 text-center">
+            {% if user_profile.photo %}
+                <img src="{{ user_profile.photo.url }}" alt="Photo de profil" class="rounded-circle" width="120" height="120">
+            {% else %}
+                <img src="{% static 'img/default-profile.png' %}" alt="Photo de profil" class="rounded-circle" width="120" height="120">
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <label for="id_photo" class="form-label">Photo de profil</label>
+            {{ form.photo }}
+        </div>
+        <div class="mb-3">
+            <label for="id_numero_matricule" class="form-label">Numéro matricule</label>
+            {{ form.numero_matricule }}
+        </div>
+        <div class="mb-3">
+            <label for="id_faculty" class="form-label">Faculté</label>
+            {{ form.faculty }}
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </form>
+</div>
+{% endblock %}

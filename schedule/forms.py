@@ -1,8 +1,22 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Course, CourseSchedule, Work
+from .models import Course, CourseSchedule, Work, CourseFile
+
+class CourseFileForm(forms.ModelForm):
+    class Meta:
+        model = CourseFile
+        fields = ['file', 'description']
+        widgets = {
+            'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Description du fichier (optionnel)'}),
+        }
+
+class CourseFileMultipleForm(forms.Form):
+    files = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=True)
+    description = forms.CharField(max_length=255, required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Description commune (optionnel)'}))
 
 class CourseForm(forms.ModelForm):
+    pdf_file = forms.FileField(required=False, label='PDF du cours (optionnel)', widget=forms.FileInput(attrs={'class': 'form-control'}))
+
     class Meta:
         model = Course
         fields = ['name', 'professor', 'total_hours', 'faculty', 'finished']
