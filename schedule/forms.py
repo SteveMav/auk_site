@@ -87,3 +87,8 @@ class WorkForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if faculty:
             self.fields['course'].queryset = Course.objects.filter(faculty=faculty, finished=False)
+        # Ajoute la classe Bootstrap à tous les champs (sauf Checkbox/Radio)
+        for name, field in self.fields.items():
+            if not isinstance(field.widget, (forms.CheckboxInput, forms.RadioSelect)):
+                existing_classes = field.widget.attrs.get('class', '')
+                field.widget.attrs['class'] = (existing_classes + ' form-control custom-field').strip()

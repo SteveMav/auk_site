@@ -8,114 +8,62 @@
     <title>Horaires des cours</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/schedule.css' %}">
-    <style>
-        body {
-            background: linear-gradient(135deg, #002868 0%, #ffffff 50%, #bf0a30 100%);
-            min-height: 100vh;
-        }
-        .navbar {
-            background: #002868;
-        }
-        .navbar-brand, .nav-link, .navbar-nav .nav-link.active {
-            color: #fff !important;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-        .navbar-nav .nav-link:hover {
-            color: #bf0a30 !important;
-            transition: color .3s;
-        }
-        .main-content {
-            background: rgba(255,255,255,0.97);
-            border-radius: 1rem;
-            box-shadow: 0 6px 36px rgba(0,0,0,0.07);
-            margin-top: 2rem;
-            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
-        }
-        footer {
-            background: #002868;
-            color: #fff;
-            padding: 1rem 0;
-            text-align: center;
-            margin-top: 3rem;
-            border-radius: 1rem 1rem 0 0;
-            font-size: 1rem;
-        }
-    </style>
+    
 </head>
 <body>
 {% include 'navbar.html' %}
-    <div class="container">
-        <a class="navbar-brand" href="/">AUK</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
-                <li class="nav-item"><a class="nav-link active" href="/schedule/">Horaires</a></li>
-                <li class="nav-item"><a class="nav-link" href="/schedule/course/">Tous les cours</a></li>
-                <li class="nav-item"><a class="nav-link" href="#news">News</a></li>
-                {% if user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link" href="/admin/">Admin</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/profile/">Mon profil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/logout/">Déconnexion</a></li>
-                {% else %}
-                    <li class="nav-item"><a class="nav-link" href="/login/">Connexion</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/register/">Inscription</a></li>
-                {% endif %}
-            </ul>
+
+<div class="container main-content">
+    <div class="row justify-content-center align-items-center mb-4">
+        <div class="col-auto">
+            <i class="bi bi-calendar-week" style="font-size:2rem;color:#002868;margin-right:0.5rem;"></i>
+        </div>
+        <div class="col-auto">
+            <h2 class="mb-0 fw-bold" style="color:#002868; letter-spacing:1px;">Horaires des cours de la semaine</h2>
         </div>
     </div>
-</nav>
-<div class="container main-content">
-
-    <div class="d-flex align-items-center justify-content-center mb-4">
-    <i class="bi bi-calendar-week" style="font-size:2rem;color:#002868;margin-right:0.5rem;"></i>
-    <h2 class="mb-4">Horaires des cours de la semaine</h2>
-</div>
-
     {% for day in days_of_week %}
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h3 class="mb-0">{{ day }}</h3>
+        <div class="mb-4">
+            <div class="card-header bg-primary text-white rounded-top mb-2">
+                <h3 class="mb-0 fs-4">{{ day }}</h3>
             </div>
-            <div class="card-body">
-                {% if courses_by_day|get_item:day %}
-                    <div class="list-group">
+            {% if courses_by_day|get_item:day %}
+                <div class="row g-3">
                     {% for item in courses_by_day|get_item:day %}
-                        <div class="list-group-item">
-                            <h5 class="mb-1">
-    <a href="#" data-bs-toggle="modal" data-bs-target="#modalCourseFiles{{ item.course.id }}">
-        {{ item.course.name }}
-    </a>
-</h5>
-<p class="mb-1">
-    <strong>Professeur:</strong> {{ item.course.professor }}<br>
-    <strong>Faculté:</strong> {{ item.course.faculty.name }}<br>
-    <strong>Horaire:</strong> {{ item.schedule.start_time }} - {{ item.schedule.end_time }}<br>
-    <strong>Status:</strong> {{ item.course.finished|yesno:"Terminé,En cours" }}
-    {% if perms.schedule.change_courseschedule %}
-    <div class="mt-2">
-        <a href="{% url 'schedule:edit_schedule' item.schedule.id %}" class="btn btn-sm btn-primary">
-            <i class="bi bi-pencil"></i> Modifier l'horaire
-        </a>
-        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalCourseFiles{{ item.course.id }}">Ajouter un PDF</button>
-    </div>
-    {% endif %}
-</p>
-{% include 'schedule/course_file_modal.html' with course=item.course %}
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
+                        <div class="card flex-fill h-100 shadow-sm border-0">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title fw-bold mb-2 text-primary">
+                                    <i class="bi bi-journal-bookmark me-1"></i>
+                                    {{ item.course.name }}
+                                </h5>
+                                <div class="card-text mb-2 small">
+                                    <div><strong>Professeur:</strong> {{ item.course.professor }}</div>
+                                    <div><strong>Faculté:</strong> {{ item.course.faculty.name }}</div>
+                                    <div><strong>Horaire:</strong> {{ item.schedule.start_time }} - {{ item.schedule.end_time }}</div>
+                                    <div><strong>Status:</strong> {{ item.course.finished|yesno:"Terminé,En cours" }}</div>
+                                </div>
+                                <div class="mt-auto d-flex flex-wrap gap-2">
+                                    {% if perms.schedule.change_courseschedule %}
+                                        <a href="{% url 'schedule:edit_schedule' item.schedule.id %}" class="btn btn-sm btn-primary rounded-pill px-3">
+                                            <i class="bi bi-pencil"></i> Modifier
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-success rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalCourseFiles{{ item.course.id }}">
+                                            <i class="bi bi-file-earmark-plus"></i> PDF
+                                        </button>
+                                    {% endif %}
+                                </div>
+                                {% include 'schedule/course_file_modal.html' with course=item.course %}
+                            </div>
                         </div>
-                    {% endfor %}
                     </div>
-                {% else %}
-                    <p class="text-muted">Aucun cours prévu ce jour</p>
-                {% endif %}
-            </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted m-3">Aucun cours prévu ce jour</p>
+            {% endif %}
         </div>
     {% endfor %}
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </div>
 {% include 'footer.html' %}

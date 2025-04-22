@@ -1,41 +1,122 @@
-
-
-{% include 'navbar.html' %}
 {% load static %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-{% block content %}
-<div class="d-flex justify-content-center align-items-center min-vh-100" style="background: linear-gradient(135deg, #002868 0%, #ffffff 50%, #bf0a30 100%);">
-    <div class="card shadow-lg p-4" style="max-width: 500px; width: 100%; border-radius: 1.2rem; background: rgba(255,255,255,0.98);">
-        <div class="text-center mb-4">
-            <h2 class="fw-bold" style="color:#002868;"><i class="bi bi-plus-circle me-2" style="color:#bf0a30;"></i>Créer un nouveau TP</h2>
-        </div>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% for field in form %}
-            <div class="mb-3">
-                <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
-                {{ field }}
-                {% if field.help_text %}
-                <small class="form-text text-muted">{{ field.help_text }}</small>
-                {% endif %}
-                {% if field.errors %}
-                <div class="alert alert-danger mt-1">
-                    {{ field.errors }}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer un nouveau TP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #002868 0%, #ffffff 50%, #bf0a30 100%);
+            min-height: 100vh;
+        }
+        .work-create-card {
+            max-width: 500px;
+            width: 100%;
+            border-radius: 1.2rem;
+            background: rgba(255,255,255,0.98);
+            box-shadow: 0 6px 36px rgba(0,0,0,0.09);
+        }
+        .work-create-title {
+            color: #002868;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .btn-primary, .btn-outline-secondary {
+            border-radius: 2rem;
+            font-weight: 500;
+        }
+        @media (max-width: 575px) {
+            .work-create-card {
+                padding: 1.2rem !important;
+            }
+            .work-create-title {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100 py-4">
+        <div class="card shadow-lg p-4 work-create-card">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold work-create-title"><i class="bi bi-plus-circle me-2" style="color:#bf0a30;"></i>Créer un nouveau TP</h2>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold" style="color:#002868; letter-spacing:0.5px;">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div class="alert alert-danger mt-1">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-            </div>
-            {% endfor %}
-            <div class="d-flex justify-content-between mt-4">
-                <button type="submit" class="btn btn-primary px-4">
-                    <i class="bi bi-check-circle me-1"></i>Créer le TP
-                </button>
-                <a href="{% url 'schedule:work_list' %}" class="btn btn-outline-secondary px-4">
-                    <i class="bi bi-x-circle me-1"></i>Annuler
-                </a>
-            </div>
-        </form>
+                {% endfor %}
+                <div class="d-flex justify-content-between mt-4 gap-2 flex-wrap">
+                    <button type="submit" class="btn btn-primary px-4 mb-2 mb-md-0">
+                        <i class="bi bi-check-circle me-1"></i>Créer le TP
+                    </button>
+                    <a href="{% url 'schedule:work_list' %}" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-x-circle me-1"></i>Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+        <style>
+            .custom-field, .form-control, select, textarea, input[type="file"] {
+                border-radius: 1.2rem !important;
+                border: 1.5px solid #d6d6e7;
+                box-shadow: 0 2px 10px rgba(0,40,104,0.04);
+                transition: border-color 0.2s, box-shadow 0.2s;
+                background: #f8faff;
+                font-size: 1.05rem;
+            }
+            .custom-field:focus, .form-control:focus, select:focus, textarea:focus {
+                border-color: #002868;
+                box-shadow: 0 0 0 0.15rem rgba(0,40,104,0.14);
+                background: #fff;
+            }
+            input[type="file"]::-webkit-file-upload-button {
+                border-radius: 1.2rem;
+                background: #002868;
+                color: #fff;
+                border: none;
+                padding: 0.4rem 1.2rem;
+                font-weight: 500;
+                transition: background 0.2s;
+            }
+            input[type="file"]:hover::-webkit-file-upload-button {
+                background: #bf0a30;
+            }
+            input[type="file"]::file-selector-button {
+                border-radius: 1.2rem;
+                background: #002868;
+                color: #fff;
+                border: none;
+                padding: 0.4rem 1.2rem;
+                font-weight: 500;
+                transition: background 0.2s;
+            }
+            input[type="file"]:hover::file-selector-button {
+                background: #bf0a30;
+            }
+            label.form-label {
+                font-weight: 600;
+                margin-bottom: 0.4rem;
+            }
+        </style>
+
     </div>
-</div>
-{% endblock %}
-{% include 'footer.html' %}
+    {% include 'footer.html' %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
