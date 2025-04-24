@@ -1,7 +1,7 @@
 {% load static %}
 <nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background:#002868;">
     <div class="container">
-        <a class="navbar-brand" href="/"><img src="{% static 'img/logo-auk.png' %}" alt="AUK Logo" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover;"> AUK</a>
+        <a class="navbar-brand" href="/"><img src="{% static 'img/logo-auk.png' %}" alt="AUK Logo" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover;"> AUK</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -9,14 +9,12 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
                 
-                
                 {% if perms.schedule.add_course %}
-
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="scheduleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Horaires
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <ul class="dropdown-menu" aria-labelledby="scheduleDropdown">
                         <li><a class="dropdown-item" href="/schedule/">Voir les horaires</a></li>
                         <li><a class="dropdown-item" href="{% url 'schedule:create_course' %}">Ajouter un cours</a></li>
                     </ul>
@@ -25,14 +23,26 @@
                 <li class="nav-item"><a class="nav-link" href="/schedule/">Horaires</a></li>
                 {% endif %}
                 <li class="nav-item"><a class="nav-link" href="/schedule/course/">Tous les cours</a></li>
+                {% if perms.event_news.add_news %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="newsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        News
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="newsDropdown">
+                        <li><a class="dropdown-item" href="/event_news/">Voir les news</a></li>
+                        <li><a class="dropdown-item" href="{% url 'event_news:add_content' %}">Ajouter une news</a></li>
+                    </ul>
+                </li>
+                {% else %}
                 <li class="nav-item"><a class="nav-link" href="/event_news/">News</a></li>
+                {% endif %}
                 {% if user.is_authenticated %}
                 {% if perms.schedule.add_work %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="workDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         TP/TD
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <ul class="dropdown-menu" aria-labelledby="workDropdown">
                         <li><a class="dropdown-item" href="/schedule/works/">Voir les TP/TD</a></li>
                         <li><a class="dropdown-item" href="{% url 'schedule:create_work' %}">Ajouter un TP/TD</a></li>
                     </ul>
@@ -50,7 +60,6 @@
         </div>
     </div>
 </nav>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <style>
     .navbar {
         background: #002868 !important;
@@ -87,5 +96,25 @@
     .navbar .nav-link, .navbar .dropdown-toggle {
         padding-left: 1rem;
         padding-right: 1rem;
+    }
+    @media (max-width: 991px) {
+        .navbar-nav .dropdown-menu {
+            position: static;
+            float: none;
+        }
+        .navbar-nav .dropdown-toggle::after {
+            float: right;
+            margin-top: 8px;
+        }
+    }
+    .navbar-toggler {
+        transition: transform 0.3s ease-in-out;
+    }
+    .navbar-toggler .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        transition: background-image 0.3s ease-in-out;
+    }
+    .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M6 6l18 18M24 6L6 24'/%3e%3c/svg%3e");
     }
 </style>

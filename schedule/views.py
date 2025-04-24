@@ -10,7 +10,7 @@ from .forms import CourseForm, CourseScheduleForm, WorkForm, CourseFileForm, Cou
 from django.template.loader import render_to_string
 import json
 
-
+from django.views.decorators.http import require_POST
 
 @login_required
 @permission_required('schedule.add_coursefile')
@@ -58,6 +58,24 @@ def course_files_view(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     files = course.files.all()
     return render(request, 'schedule/course_files_view.html', {'course': course, 'files': files})
+
+from django.views.decorators.http import require_POST
+
+@login_required
+@require_POST
+def delete_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    # Seuls les superusers ou CP de la même faculté peuvent supprimer
+    if not request.user.is_superuser:
+        try:
+            cp_profile = CPProfile.objects.get(user=request.user)
+            if course.faculty != cp_profile.faculty:
+                return HttpResponseForbidden("Vous ne pouvez supprimer que les cours de votre propre faculté.")
+        except CPProfile.DoesNotExist:
+            return HttpResponseForbidden("Accès non autorisé.")
+    course.delete()
+    messages.success(request, f'Le cours "{course.name}" a été supprimé avec succès.')
+    return redirect('schedule:course_list')
 
 @login_required
 @permission_required('schedule.add_course')
@@ -212,6 +230,24 @@ def edit_schedule(request, schedule_id):
         'course': course
     })
 
+from django.views.decorators.http import require_POST
+
+@login_required
+@require_POST
+def delete_schedule(request, schedule_id):
+    schedule = get_object_or_404(CourseSchedule, id=schedule_id)
+    course = schedule.course
+    # Permissions identiques à edit_schedule
+    if not request.user.is_superuser:
+        try:
+            cp_profile = CPProfile.objects.get(user=request.user)
+            if course.faculty != cp_profile.faculty:
+                return HttpResponseForbidden("Vous ne pouvez supprimer que les horaires de votre faculté.")
+        except CPProfile.DoesNotExist:
+            return HttpResponseForbidden("Accès non autorisé.")
+    schedule.delete()
+    messages.success(request, f"L'horaire du cours '{course.name}' ({schedule.start_time} - {schedule.end_time}) a été supprimé avec succès.")
+    return redirect('schedule:course_list')
 
 @login_required
 def create_work(request):
