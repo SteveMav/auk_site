@@ -1,7 +1,10 @@
 {% load static %}
 <nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background:#002868;">
     <div class="container">
-        <a class="navbar-brand" href="/"><img src="{% static 'img/logo-auk.png' %}" alt="AUK Logo" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover;"> AUK</a>
+        <a class="navbar-brand" href="/">
+            <img src="{% static 'img/logo-auk.png' %}" alt="AUK Logo" class="img-fluid rounded-circle shadow-sm" style="width: 40px; height: 40px; object-fit: cover; transition: transform 0.3s ease;">
+            <span class="ms-2 fw-bold text-white" style="letter-spacing: 1px;">AUK</span>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -23,6 +26,9 @@
                 <li class="nav-item"><a class="nav-link" href="/schedule/">Horaires</a></li>
                 {% endif %}
                 <li class="nav-item"><a class="nav-link" href="/schedule/course/">Tous les cours</a></li>
+                {% if user.is_staff %}
+                <li class="nav-item"><a class="nav-link" href="/all-students/">Tous les étudiants</a></li>
+                {% endif %}
                 {% if perms.event_news.add_news %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="newsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

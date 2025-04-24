@@ -3,6 +3,9 @@ from django.utils import timezone
 from datetime import datetime, time, timedelta
 from schedule.models import CourseSchedule
 from event_news.models import News
+from accounts.models import UserProfile
+from django.contrib.auth.decorators import user_passes_test
+from django.db.models import Count, Q
 
 def get_user_courses(user):
     """
@@ -61,6 +64,30 @@ def index(request):
     return render(request, 'home/index.html', {
         'course_info': course_info,
         'latest_news': latest_news,
+    })
+
+@user_passes_test(lambda u: u.is_superuser)
+def all_students_view(request):
+    q = request.GET.get('q', '').strip()
+    faculty_id = request.GET.get('faculty', '')
+    students = UserProfile.objects.select_related('user', 'faculty').all()
+    if q:
+        students = students.filter(Q(user__first_name__icontains=q) | Q(user__last_name__icontains=q))
+    if faculty_id:
+        students = students.filter(faculty_id=faculty_id)
+    students = students.order_by('faculty__name', 'user__last_name', 'user__first_name')
+    # Comptage par faculté
+    faculty_counts = UserProfile.objects.values('faculty__id','faculty__name').annotate(count=Count('id')).order_by('faculty__name')
+    from schedule.models import Faculty
+    faculties = Faculty.objects.all()
+    students_total = UserProfile.objects.count()
+    return render(request, 'main/all_students.html', {
+        'students': students,
+        'faculty_counts': faculty_counts,
+        'faculties': faculties,
+        'q': q,
+        'faculty_id': faculty_id,
+        'students_total': students_total,
     })
 
 # from pprint import pprint
