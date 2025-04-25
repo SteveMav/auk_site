@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modification de l'horaire d'un cours</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f6f8fa; color: #222; }
+        .container { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #e0e0e0; max-width: 500px; margin: 30px auto; padding: 2rem; }
+        .btn { background: #002868; color: #fff; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 18px; }
+        .btn:hover { background: #bf0a30; }
+        .footer { margin-top: 2rem; font-size: 0.9em; color: #888; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Bonjour {{ user.first_name|default:user.username }},</h2>
+        <p>L'horaire d'un cours de votre faculté a été modifié :</p>
+        <h3>{{ course.name }}</h3>
+        <p><strong>Semestre :</strong> {{ course.semester }}</p>
+        <p><strong>Enseignant :</strong> {{ course.teacher }}</p>
+        <a class="btn" href="{{ course_url }}">Voir le cours</a>
+        <div class="footer">
+            <p>Cet email vous est envoyé automatiquement par l'AUK.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Course, CourseSchedule, Work, CourseFile
+from .models import Course, CourseSchedule, Work, CourseFile, Exam
 
 class CourseFileForm(forms.ModelForm):
     class Meta:
@@ -87,6 +87,25 @@ class WorkForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if faculty:
             self.fields['course'].queryset = Course.objects.filter(faculty=faculty, finished=False)
+        # Ajoute la classe Bootstrap à tous les champs (sauf Checkbox/Radio)
+        for name, field in self.fields.items():
+            if not isinstance(field.widget, (forms.CheckboxInput, forms.RadioSelect)):
+                existing_classes = field.widget.attrs.get('class', '')
+                field.widget.attrs['class'] = (existing_classes + ' form-control custom-field').strip()
+
+class ExamForm(forms.ModelForm):
+    class Meta:
+        model = Exam
+        fields = '__all__'
+        widgets = {
+            'course': forms.Select(attrs={'class': 'form-select'}),
+            'semester': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Semestre'}),
+            'date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Salle ou lieu'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # Ajoute la classe Bootstrap à tous les champs (sauf Checkbox/Radio)
         for name, field in self.fields.items():
             if not isinstance(field.widget, (forms.CheckboxInput, forms.RadioSelect)):

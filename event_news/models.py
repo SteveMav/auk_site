@@ -9,9 +9,17 @@ class Event(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     participants = models.ManyToManyField(User, related_name='event_participants')
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('event_news:event_detail', args=[str(self.id)])
+
 class News(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     image = models.ImageField(upload_to='news_images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('event_news:news_detail', args=[str(self.id)])

@@ -82,7 +82,7 @@
                             <strong>Status:</strong> {{ course.finished|yesno:"Terminé,En cours" }}
                         </p>
                         {% if perms.schedule.add_coursefile %}
-                            {% with "Ajouter un PDF" as btn_text %}
+                            {% with "Ajouter un document" as btn_text %}
                                 <button type="button" class="btn btn-outline-success btn-sm add-pdf-btn" data-bs-toggle="modal" data-bs-target="#modalCourseFiles{{ course.id }}">
                                     <i class="bi bi-file-earmark-plus me-1"></i>{{ btn_text }}
                                 </button>
@@ -106,7 +106,6 @@
             </a>
         </div>
     </div>
-    {% include 'footer.html' %}
     <script>
         // Filtrage dynamique des cartes de cours par nom
         document.addEventListener('DOMContentLoaded', function() {
@@ -125,5 +124,6 @@
             });
         });
     </script>
+    {% include 'footer.html' %}
 </body>
 </html>

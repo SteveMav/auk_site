@@ -5,11 +5,12 @@ from django.shortcuts import render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
-from .models import Course, CourseSchedule, Work, CPProfile, CourseFile
-from .forms import CourseForm, CourseScheduleForm, WorkForm, CourseFileForm, CourseFileMultipleForm
+from .models import Course, CourseSchedule, Work, CPProfile, CourseFile, Exam
+from .forms import CourseForm, CourseScheduleForm, WorkForm, CourseFileForm, CourseFileMultipleForm, ExamForm
 from django.template.loader import render_to_string
 import json
-
+from accounts.models import UserProfile
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST
 
 @login_required
@@ -289,11 +290,50 @@ def work_list(request):
     return render(request, 'schedule/work_list.html', {'works': works})
 
 
+
 @login_required
 def all_courses_view(request):
-    courses = Course.objects.all().prefetch_related('files', 'faculty')
+    user = request.user
+    if user.is_superuser:
+        courses = Course.objects.all().prefetch_related('files', 'faculty')
+    elif hasattr(user, 'cpprofile'):
+        courses = Course.objects.filter(faculty=user.cpprofile.faculty).prefetch_related('files', 'faculty')
+    else:
+        try:
+            faculty = UserProfile.objects.get(user=user).faculty
+            courses = Course.objects.filter(faculty=faculty).prefetch_related('files', 'faculty')
+        except (UserProfile.DoesNotExist, ObjectDoesNotExist):
+            courses = Course.objects.none()
     return render(request, 'schedule/all_courses.html', {'courses': courses})
 
+
+@login_required
+def create_exam(request):
+    # Seuls les CP et les admins peuvent créer
+    if not request.user.is_superuser and not hasattr(request.user, 'cpprofile'):
+        return HttpResponseForbidden("Seuls les CP et les administrateurs peuvent ajouter un examen.")
+
+    if request.method == 'POST':
+        form = ExamForm(request.POST)
+        if form.is_valid():
+            exam = form.save()
+            messages.success(request, "Examen ajouté avec succès.")
+            return redirect('schedule:exam_list')
+    else:
+        form = ExamForm()
+    return render(request, 'schedule/exam_form.html', {'form': form})
+
+
+@login_required
+def exam_list(request):
+    # CP : examens de sa faculté, étudiant : idem, admin : tout
+    if hasattr(request.user, 'cpprofile'):
+        exams = Exam.objects.filter(course__faculty=request.user.cpprofile.faculty, date__gte=timezone.now()).order_by('date')
+    elif hasattr(request.user, 'student'):
+        exams = Exam.objects.filter(course__faculty=request.user.student.faculty, date__gte=timezone.now()).order_by('date')
+    else:
+        exams = Exam.objects.filter(date__gte=timezone.now()).order_by('date')
+    return render(request, 'schedule/exam_list.html', {'exams': exams})
 
 
 @login_required

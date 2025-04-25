@@ -16,4 +16,6 @@ urlpatterns = [
      path('course/<int:course_id>/files/ajax_upload/', views.ajax_upload_course_file, name='ajax_upload_course_file'),
      path('course/file/<int:file_id>/ajax_delete/', views.ajax_delete_course_file, name='ajax_delete_course_file'),
      path('course/file/<int:file_id>/delete/', views.delete_course_file, name='delete_course_file'),
+     path('exams/create/', views.create_exam, name='create_exam'),
+     path('exams/', views.exam_list, name='exam_list'),
 ]

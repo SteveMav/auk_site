@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouvelle actualité sur AUK</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f6f8fa; color: #222; }
+        .container { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #e0e0e0; max-width: 500px; margin: 30px auto; padding: 2rem; }
+        .btn { background: #002868; color: #fff; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 18px; }
+        .btn:hover { background: #bf0a30; }
+        .footer { margin-top: 2rem; font-size: 0.9em; color: #888; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Bonjour {{ user.first_name|default:user.username }},</h2>
+        <p>Une nouvelle actualité vient d'être publiée sur le site de l'AUK :</p>
+        <h3>{{ news.title }}</h3>
+        <p>{{ news.summary|default:news.content|truncatechars:120 }}</p>
+        <a class="btn" href="{{ news_url }}">Voir la news</a>
+        <div class="footer">
+            <p>Cet email vous est envoyé automatiquement par l'AUK.</p>
+        </div>
+    </div>
+</body>
+</html>

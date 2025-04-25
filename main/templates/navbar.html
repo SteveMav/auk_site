@@ -12,18 +12,32 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
                 
-                {% if perms.schedule.add_course %}
+                {% if perms.schedule.add_course or perms.schedule.add_exam %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="scheduleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Horaires
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="scheduleDropdown">
-                        <li><a class="dropdown-item" href="/schedule/">Voir les horaires</a></li>
+                        <li><a class="dropdown-item" href="/schedule/">Horaires des cours</a></li>
+                        <li><a class="dropdown-item" href="/schedule/exams/">Horaires d'examens</a></li>
+                        {% if perms.schedule.add_course %}
                         <li><a class="dropdown-item" href="{% url 'schedule:create_course' %}">Ajouter un cours</a></li>
+                        {% endif %}
+                        {% if perms.schedule.add_exam %}
+                        <li><a class="dropdown-item" href="{% url 'schedule:create_exam' %}">Ajouter un examen</a></li>
+                        {% endif %}
                     </ul>
                 </li>
                 {% else %}
-                <li class="nav-item"><a class="nav-link" href="/schedule/">Horaires</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="scheduleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Horaires
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="scheduleDropdown">
+                        <li><a class="dropdown-item" href="/schedule/">Horaires des cours</a></li>
+                        <li><a class="dropdown-item" href="/schedule/exams/">Horaires d'examens</a></li>
+                    </ul>
+                </li>
                 {% endif %}
                 <li class="nav-item"><a class="nav-link" href="/schedule/course/">Tous les cours</a></li>
                 {% if user.is_staff %}
