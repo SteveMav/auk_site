@@ -143,6 +143,12 @@ def create_course(request):
                 course.delete()
                 return render(request, 'schedule/create_course.html', {'form': form, 'days': days})
 
+            # Envoi de l'email de notification après création du cours
+            from .email_utils import send_course_added_email
+            schedules = course.courseschedule_set.all()
+            schedule_info = [f"{s.get_day_of_week_display()}: {s.start_time.strftime('%H:%M')} - {s.end_time.strftime('%H:%M')}" for s in schedules]
+            send_course_added_email(course, request, schedule_info=schedule_info)
+
             return redirect('schedule:course_list')
     else:
         form = CourseForm()
@@ -165,10 +171,9 @@ def course_list(request):
         'Thursday': 'Jeudi',
         'Friday': 'Vendredi',
         'Saturday': 'Samedi',
-        'Sunday': 'Dimanche'
     }
     
-    days_of_week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+    days_of_week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
     
     # Get courses based on user role
     if request.user.is_superuser:
@@ -221,6 +226,8 @@ def edit_schedule(request, schedule_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Horaire modifié avec succès.')
+            from .email_utils import send_course_updated_email
+            send_course_updated_email(course, request)
             return redirect('schedule:course_list')
     else:
         form = CourseScheduleForm(instance=schedule)

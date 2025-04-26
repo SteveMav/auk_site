@@ -16,8 +16,8 @@
         <h2>Bonjour {{ user.first_name|default:user.username }},</h2>
         <p>Un nouveau cours a été ajouté à l'horaire de votre faculté :</p>
         <h3>{{ course.name }}</h3>
-        <p><strong>Semestre :</strong> {{ course.semester }}</p>
-        <p><strong>Enseignant :</strong> {{ course.teacher }}</p>
+        <p><strong>Jours :</strong> {{ schedule_info }}</p>
+        <p><strong>Nombre d'heures :</strong> {{ course.total_hours }}H</p>
         <a class="btn" href="{{ course_url }}">Voir le cours</a>
         <div class="footer">
             <p>Cet email vous est envoyé automatiquement par l'AUK.</p>
