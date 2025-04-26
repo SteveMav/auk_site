@@ -29,6 +29,17 @@ class CourseForm(forms.ModelForm):
         }
 
 class CourseScheduleForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['day_of_week'].choices = [
+            ('Lundi', 'Lundi'),
+            ('Mardi', 'Mardi'),
+            ('Mercredi', 'Mercredi'),
+            ('Jeudi', 'Jeudi'),
+            ('Vendredi', 'Vendredi'),
+            ('Samedi', 'Samedi'),
+            ('Dimanche', 'Dimanche'),
+        ]
     class Meta:
         model = CourseSchedule
         fields = ['course', 'day_of_week', 'start_time', 'end_time']

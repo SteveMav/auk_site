@@ -105,7 +105,12 @@
                 {% elif course_info.next_course %}
                     <h4 class="mb-1" style="color:#002868;">Prochain cours : <span style="color:#bf0a30;">{{ course_info.next_course.course.name }}</span></h4>
                     <p class="mb-2">Professeur : {{ course_info.next_course.course.professor }}</p>
-                    <p>Horaire : {{ course_info.next_course.start_time|time:"H:i" }} - {{ course_info.next_course.end_time|time:"H:i" }}</p>
+                    <p>
+                        Horaire : {{ course_info.next_course.start_time|time:"H:i" }} - {{ course_info.next_course.end_time|time:"H:i" }}
+                        {% if course_info.next_course.day_of_week != now|date:'l' %}
+                            <span class="badge bg-primary ms-2">{{ course_info.next_course.day_of_week }}</span>
+                        {% endif %}
+                    </p>
                 {% else %}
                     <h4 class="mb-1" style="color:#002868;">Cours actuel : <span style="color:#bf0a30;">Aucun cours actuellement</span></h4>
                 {% endif %}

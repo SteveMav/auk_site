@@ -81,7 +81,7 @@ def delete_course(request, course_id):
 @login_required
 @permission_required('schedule.add_course')
 def create_course(request):
-    days = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+    days = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche')
     cp_profile = None
 
     if request.user.is_superuser:
@@ -121,8 +121,8 @@ def create_course(request):
                 if 'afternoon' in blocks:
                     schedules_to_create.append({
                         'day_of_week': day,
-                        'start_time': '14:00',
-                        'end_time': '18:00'
+                        'start_time': '13:00',
+                        'end_time': '16:00'
                     })
 
                 for schedule_data in schedules_to_create:
@@ -165,15 +165,16 @@ def create_course(request):
 def course_list(request):
     # Dictionnaire de traduction des jours
     day_translation = {
-        'Monday': 'Lundi',
-        'Tuesday': 'Mardi',
-        'Wednesday': 'Mercredi',
-        'Thursday': 'Jeudi',
-        'Friday': 'Vendredi',
-        'Saturday': 'Samedi',
+        'Lundi': 'Lundi',
+        'Mardi': 'Mardi',
+        'Mercredi': 'Mercredi',
+        'Jeudi': 'Jeudi',
+        'Vendredi': 'Vendredi',
+        'Samedi': 'Samedi',
+        'Dimanche': 'Dimanche',
     }
     
-    days_of_week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
+    days_of_week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
     
     # Get courses based on user role
     if request.user.is_superuser:

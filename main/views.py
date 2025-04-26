@@ -32,30 +32,84 @@ def get_user_courses(user):
         return {'current_course': None, 'next_course': None, 'all_courses': []}
 
     # Récupère tous les cours du jour pour la faculty de l'utilisateur
-    courses = CourseSchedule.objects.filter(
+    courses_today = CourseSchedule.objects.filter(
         course__faculty=faculty,
         day_of_week=current_weekday,
         course__finished=False
     ).order_by('start_time')
 
-    logger.info(f"Cours trouvés pour {faculty} ({current_weekday}): {[str(c) for c in courses]}")
+    logger.info(f"Cours trouvés pour {faculty} ({current_weekday}): {[str(c) for c in courses_today]}")
 
     current_course = None
     next_course = None
-    for course in courses:
+    for course in courses_today:
         if course.start_time <= current_time.time() <= course.end_time:
             current_course = course
             break  # On prend le premier qui correspond
     if not current_course:
-        for course in courses:
+        for course in courses_today:
             if course.start_time > current_time.time():
                 next_course = course
                 break
-    return {
-        'current_course': current_course,
-        'next_course': next_course,
-        'all_courses': list(courses),
-    }
+
+    # Si aucun cours aujourd'hui (ni en cours ni à venir), chercher le prochain cours tous jours confondus
+    if not current_course and not next_course:
+        all_next_courses = CourseSchedule.objects.filter(
+            course__faculty=faculty,
+            course__finished=False,
+            # On ne filtre pas sur le jour
+        ).order_by(
+            'day_of_week', 'start_time'
+        )
+        # On cherche le prochain cours après maintenant (date + heure)
+        # On construit une liste triée par date/heure réelle
+        from datetime import timedelta
+        weekday_to_int = {
+            'Lundi': 0, 'Mardi': 1, 'Mercredi': 2, 'Jeudi': 3,
+            'Vendredi': 4, 'Samedi': 5, 'Dimanche': 6
+        }
+        now_weekday = current_time.weekday()
+        now_time = current_time.time()
+        soonest = None
+        soonest_delta = None
+        for sched in all_next_courses:
+            sched_weekday = weekday_to_int[sched.day_of_week]
+            days_ahead = (sched_weekday - now_weekday) % 7
+            sched_datetime = (current_time + timedelta(days=days_ahead)).replace(
+                hour=sched.start_time.hour,
+                minute=sched.start_time.minute,
+                second=0,
+                microsecond=0
+            )
+            # Si c'est aujourd'hui mais déjà passé, on saute
+            if days_ahead == 0 and sched.start_time <= now_time:
+                continue
+            delta = sched_datetime - current_time
+            if soonest is None or delta < soonest_delta:
+                soonest = sched
+                soonest_delta = delta
+        next_course = soonest
+        # Pour all_courses, on retourne les cours du prochain jour où il y a cours
+        if soonest:
+            next_day = soonest.day_of_week
+            courses_that_day = CourseSchedule.objects.filter(
+                course__faculty=faculty,
+                day_of_week=next_day,
+                course__finished=False
+            ).order_by('start_time')
+        else:
+            courses_that_day = []
+        return {
+            'current_course': None,
+            'next_course': next_course,
+            'all_courses': list(courses_that_day),
+        }
+    else:
+        return {
+            'current_course': current_course,
+            'next_course': next_course,
+            'all_courses': list(courses_today),
+        }
 
 def index(request):
     course_info = get_user_courses(request.user)

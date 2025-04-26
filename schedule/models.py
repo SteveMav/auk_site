@@ -25,7 +25,7 @@ class Student(models.Model):
 class Course(models.Model):
     name = models.CharField(max_length=255)
     professor = models.CharField(max_length=255)
-    total_hours = models.FloatField()
+    total_hours = models.IntegerField(null=True, blank=True)
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
     finished = models.BooleanField(default=False)
     def __str__(self):
@@ -34,9 +34,9 @@ class Course(models.Model):
 class CourseSchedule(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     day_of_week = models.CharField(max_length=10, choices=[
-        ('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'),
-        ('Thursday', 'Thursday'), ('Friday', 'Friday'), ('Saturday', 'Saturday'),
-        ('Sunday', 'Sunday')
+        ('Lundi', 'Lundi'), ('Mardi', 'Mardi'), ('Mercredi', 'Mercredi'),
+        ('Jeudi', 'Jeudi'), ('Vendredi', 'Vendredi'), ('Samedi', 'Samedi'),
+        ('Dimanche', 'Dimanche')
     ])
     start_time = models.TimeField()
     end_time = models.TimeField()
