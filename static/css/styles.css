@@ -1,0 +1,199 @@
+/* =============================
+   Layout & General
+   ============================= */
+body {
+    background: linear-gradient(135deg, #002868 0%, #ffffff 50%, #bf0a30 100%);
+    min-height: 100vh;
+}
+
+/* =============================
+   Navbar
+   ============================= */
+.navbar {
+    background: #002868;
+}
+.navbar-brand, .nav-link, .navbar-nav .nav-link.active {
+    color: #fff !important;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+.navbar-nav .nav-link:hover {
+    color: #bf0a30 !important;
+    transition: color .3s;
+}
+
+/* =============================
+   Hero Section
+   ============================= */
+.hero {
+    background: rgba(255,255,255,0.95);
+    border-radius: 1rem;
+    box-shadow: 0 6px 36px rgba(0,0,0,0.07);
+    margin-top: 2rem;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    animation: fadeInDown 1s;
+}
+.hero-title {
+    color: #002868;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+.hero-subtitle {
+    color: #bf0a30;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+/* =============================
+   Footer
+   ============================= */
+.footer {
+    background: #002868;
+    color: #fff;
+    padding: 2rem 0 1rem 0;
+    margin-top: 3rem;
+    border-top: 4px solid #bf0a30;
+    border-radius: 1.2rem 1.2rem 0 0;
+    font-size: 1.08rem;
+    text-align: center;
+}
+.footer a {
+    color: #fff;
+    margin: 0 .5rem;
+    font-size: 1.3rem;
+    text-decoration: underline;
+}
+.footer a:hover {
+    color: #bf0a30;
+}
+
+/* =============================
+   Cards & Sections (News, Course)
+   ============================= */
+.news-section {
+    margin-top: 2.5rem;
+    animation: fadeInUp 1.2s;
+}
+.news-card {
+    transition: transform .3s, box-shadow .3s;
+}
+.news-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(191,10,48,0.15);
+}
+.course-info, .news-item {
+    margin: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+}
+.current-course {
+    border-left: 4px solid #4CAF50;
+}
+.next-course {
+    border-left: 4px solid #2196F3;
+}
+.news-item {
+    border-left: 4px solid #FF9800;
+}
+.course-status {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+.current-course .course-status {
+    color: #4CAF50;
+}
+.next-course .course-status {
+    color: #2196F3;
+}
+.news-date {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+.news-content {
+    margin-top: 10px;
+}
+.news-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+.section-title {
+    margin: 20px;
+    color: #333;
+    border-bottom: 2px solid #FF9800;
+    padding-bottom: 5px;
+}
+
+/* =============================
+   Forms & Boxes
+   ============================= */
+.confirmation-box, .register-box, .login-box {
+    background: rgba(255,255,255,0.97);
+    border-radius: 1rem;
+    box-shadow: 0 6px 36px rgba(0,0,0,0.07);
+    margin: 3rem auto;
+    max-width: 420px;
+    padding: 2.5rem 2rem 2rem 2rem;
+    animation: fadeInDown 1s;
+}
+.confirmation-title, .register-title, .login-title {
+    color: #002868;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+}
+.form-label { color: #002868; }
+
+/* =============================
+   Buttons
+   ============================= */
+.btn-primary {
+    background: #bf0a30;
+    border: none;
+}
+.btn-primary:hover {
+    background: #002868;
+}
+
+/* =============================
+   Utilities
+   ============================= */
+.us-ribbon {
+    background: repeating-linear-gradient(90deg, #bf0a30, #bf0a30 10px, #fff 10px, #fff 20px, #002868 20px, #002868 30px);
+    height: 6px;
+    border-radius: 3px;
+    margin: 0 auto 1.5rem auto;
+    width: 120px;
+}
+.text-link { color: #bf0a30; text-decoration: underline; }
+.text-link:hover { color: #002868; }
+
+/* =============================
+   Animations
+   ============================= */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* =============================
+   Custom Utility Classes
+   ============================= */
+.rounded {
+    border-radius: 1rem !important;
+}
+.shadow {
+    box-shadow: 0 6px 36px rgba(0,0,0,0.07) !important;
+}
+.shadow-sm {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.09) !important;
+}

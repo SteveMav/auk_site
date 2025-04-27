@@ -44,9 +44,12 @@
         }
     </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     {% include 'navbar.html' %}
-    <div class="container py-5">
+    <main class="flex-grow-1">
+    <div class="container-fluid px-0">
+        <div class="row min-vh-100 justify-content-center align-items-start">
+            <div class="col-12 col-lg-10 py-5">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 gap-3">
             <h2 class="fw-bold tp-title"><i class="bi bi-journal-text me-2" style="color:#bf0a30;"></i>Liste des Travaux Pratiques</h2>
             {% if user.cpprofile %}
@@ -56,7 +59,7 @@
             {% endif %}
         </div>
         {% if works %}
-        <div class="row justify-content-center">
+        <div class="row justify-content-center mx-auto">
             {% for work in works %}
             <div class="col-xl-5 col-lg-6 col-md-8 col-12 mt-3">
                 <div class="card tp-card h-100 {% if work.due_date < now %}grayscale{% endif %}">
@@ -98,17 +101,9 @@
         </div>
         {% endif %}
     </div>
+    </div>
+    </div>
+    </main>
     {% include 'footer.html' %}
 </body>
-<style>
-body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 110px;
-}
-.container, .content, .main-content {
-    flex: 1 0 auto;
-}
-</style>
 </html>

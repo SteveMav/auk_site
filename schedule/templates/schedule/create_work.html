@@ -7,6 +7,7 @@
     <title>Créer un nouveau TP</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <style>
         body {
             background: linear-gradient(135deg, #002868 0%, #ffffff 50%, #bf0a30 100%);
@@ -38,8 +39,9 @@
         }
     </style>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     {% include 'navbar.html' %}
+    <main class="flex-grow-1">
     <div class="d-flex justify-content-center align-items-center min-vh-100 py-4">
         <div class="card shadow-lg p-4 work-create-card">
             <div class="text-center mb-4">
@@ -116,17 +118,7 @@
         </style>
 
     </div>
+    </main>
     {% include 'footer.html' %}
 </body>
-<style>
-body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 110px;
-}
-.container, .content, .main-content {
-    flex: 1 0 auto;
-}
-</style>
 </html>
