@@ -7,6 +7,7 @@ from accounts.models import UserProfile
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Count, Q
 
+
 def get_user_courses(user):
     """
     Retourne un dictionnaire avec :
@@ -20,8 +21,21 @@ def get_user_courses(user):
     if not user.is_authenticated:
         return {'current_course': None, 'next_course': None, 'all_courses': []}
 
-    current_time = timezone.localtime()
-    current_weekday = current_time.strftime('%A')
+    from datetime import timezone as dt_timezone, timedelta
+    gmt1 = dt_timezone(timedelta(hours=1))
+    current_time = timezone.now().astimezone(gmt1)
+    print(current_time)
+    # Conversion du jour anglais en français
+    weekday_en_to_fr = {
+        'Monday': 'Lundi',
+        'Tuesday': 'Mardi',
+        'Wednesday': 'Mercredi',
+        'Thursday': 'Jeudi',
+        'Friday': 'Vendredi',
+        'Saturday': 'Samedi',
+        'Sunday': 'Dimanche',
+    }
+    current_weekday = weekday_en_to_fr[current_time.strftime('%A')]
 
     try:
         from accounts.models import UserProfile
@@ -42,27 +56,28 @@ def get_user_courses(user):
 
     current_course = None
     next_course = None
+    from datetime import timedelta, datetime
+    logger.info(f"DEBUG courses_today: {[str(c) for c in courses_today]}")
+    # 1. Cherche d'abord s'il y a un cours en cours (current_course) aujourd'hui
     for course in courses_today:
-        if course.start_time <= current_time.time() <= course.end_time:
+        start = datetime.combine(current_time.date(), course.start_time, tzinfo=gmt1)
+        end = datetime.combine(current_time.date(), course.end_time, tzinfo=gmt1) + timedelta(minutes=1) - timedelta(seconds=1)
+        now = current_time
+        if start <= now <= end:
             current_course = course
-            break  # On prend le premier qui correspond
+            break
+    # 2. Si pas de cours en cours, cherche le prochain cours d'aujourd'hui
     if not current_course:
         for course in courses_today:
             if course.start_time > current_time.time():
                 next_course = course
                 break
-
-    # Si aucun cours aujourd'hui (ni en cours ni à venir), chercher le prochain cours tous jours confondus
+    # 3. Si ni cours actuel ni prochain aujourd'hui, cherche le prochain cours tous jours confondus
     if not current_course and not next_course:
         all_next_courses = CourseSchedule.objects.filter(
             course__faculty=faculty,
             course__finished=False,
-            # On ne filtre pas sur le jour
-        ).order_by(
-            'day_of_week', 'start_time'
-        )
-        # On cherche le prochain cours après maintenant (date + heure)
-        # On construit une liste triée par date/heure réelle
+        ).order_by('day_of_week', 'start_time')
         from datetime import timedelta
         weekday_to_int = {
             'Lundi': 0, 'Mardi': 1, 'Mercredi': 2, 'Jeudi': 3,
@@ -81,7 +96,6 @@ def get_user_courses(user):
                 second=0,
                 microsecond=0
             )
-            # Si c'est aujourd'hui mais déjà passé, on saute
             if days_ahead == 0 and sched.start_time <= now_time:
                 continue
             delta = sched_datetime - current_time
@@ -89,7 +103,6 @@ def get_user_courses(user):
                 soonest = sched
                 soonest_delta = delta
         next_course = soonest
-        # Pour all_courses, on retourne les cours du prochain jour où il y a cours
         if soonest:
             next_day = soonest.day_of_week
             courses_that_day = CourseSchedule.objects.filter(
@@ -104,12 +117,19 @@ def get_user_courses(user):
             'next_course': next_course,
             'all_courses': list(courses_that_day),
         }
-    else:
+    # 4. Si cours en cours, n'affiche PAS de next_course
+    if current_course:
         return {
             'current_course': current_course,
-            'next_course': next_course,
+            'next_course': None,
             'all_courses': list(courses_today),
         }
+    # 5. Sinon (pas de cours en cours mais un prochain aujourd'hui)
+    return {
+        'current_course': None,
+        'next_course': next_course,
+        'all_courses': list(courses_today),
+    }
 
 def index(request):
     course_info = get_user_courses(request.user)

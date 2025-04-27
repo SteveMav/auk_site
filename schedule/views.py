@@ -12,6 +12,7 @@ import json
 from accounts.models import UserProfile
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST
+from datetime import timedelta
 
 @login_required
 @permission_required('schedule.add_coursefile')
@@ -268,7 +269,30 @@ def create_work(request):
         form = WorkForm(request.POST, request.FILES, faculty=request.user.cpprofile.faculty if hasattr(request.user, 'cpprofile') else None)
         if form.is_valid():
             work = form.save()
-            messages.success(request, 'Le TP a été créé avec succès.')
+            # Envoi d'un mail à tous les étudiants de la faculté du TP
+            from django.core.mail import send_mail
+            from django.template.loader import render_to_string
+            from django.conf import settings
+            from accounts.models import UserProfile
+            # Récupérer tous les étudiants de la faculté du cours du TP
+            faculty = work.course.faculty
+            students = UserProfile.objects.filter(faculty=faculty, user__is_active=True, user__email__isnull=False)
+            recipient_list = [s.user.email for s in students if s.user.email]
+            tp_url = request.build_absolute_uri('/schedule/works/')
+            subject = f"Nouveau TP pour le cours {work.course.name}"
+            html_message = render_to_string('emails/new_work_notification.html', {
+                'work': work,
+                'tp_url': tp_url,
+            })
+            send_mail(
+                subject,
+                '',  # plain message (vide, car on utilise html)
+                settings.DEFAULT_FROM_EMAIL,
+                recipient_list,
+                html_message=html_message,
+                fail_silently=True,
+            )
+            messages.success(request, 'Le TP a été créé avec succès. Les étudiants ont été notifiés par email.')
             return redirect('schedule:work_list')
     else:
         form = WorkForm(faculty=request.user.cpprofile.faculty if hasattr(request.user, 'cpprofile') else None)
@@ -279,27 +303,19 @@ def create_work(request):
 
 @login_required
 def work_list(request):
-    # Si c'est un CP, montrer les TPs de sa faculté
-    if hasattr(request.user, 'cpprofile'):
-        works = Work.objects.filter(
-            course__faculty=request.user.cpprofile.faculty,
-            due_date__gte=timezone.now()
-        ).order_by('due_date')
-    # Si c'est un étudiant, montrer les TPs de sa faculté
-    elif hasattr(request.user, 'student'):
-        works = Work.objects.filter(
-            course__faculty=request.user.student.faculty,
-            due_date__gte=timezone.now()
-        ).order_by('due_date')
+    now = timezone.now() + timedelta(hours=1)
+    user = request.user
+    if user.is_superuser:
+        works = Work.objects.all().order_by('-due_date')
+    elif hasattr(user, 'cpprofile'):
+        works = Work.objects.filter(course__faculty=user.cpprofile.faculty).order_by('-due_date')
+    elif hasattr(user, 'student'):
+        works = Work.objects.filter(course__faculty=user.student.faculty).order_by('-due_date')
     else:
-        # Afficher tous les TP à venir pour les autres utilisateurs
-        works = Work.objects.filter(due_date__gte=timezone.now()).order_by('due_date')
-    
-    return render(request, 'schedule/work_list.html', {'works': works})
+        works = Work.objects.none()
+    now = timezone.now() + timedelta(hours=1)
+    return render(request, 'schedule/work_list.html', {'works': works, 'now': now})
 
-
-
-@login_required
 def all_courses_view(request):
     user = request.user
     if user.is_superuser:

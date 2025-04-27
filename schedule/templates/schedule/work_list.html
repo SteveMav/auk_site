@@ -38,6 +38,10 @@
             .tp-title { font-size: 1.1rem; }
             .tp-download { font-size: 1rem; padding: 0.5rem 1rem; }
         }
+        .grayscale {
+            filter: grayscale(1);
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +59,7 @@
         <div class="row justify-content-center">
             {% for work in works %}
             <div class="col-xl-5 col-lg-6 col-md-8 col-12 mt-3">
-                <div class="card tp-card h-100">
+                <div class="card tp-card h-100 {% if work.due_date < now %}grayscale{% endif %}">
                     <div class="card-body p-4">
                         <div class="d-flex align-items-center mb-3">
                             <i class="bi bi-file-earmark-text me-2 fs-2" style="color:#002868;"></i>
@@ -96,4 +100,15 @@
     </div>
     {% include 'footer.html' %}
 </body>
+<style>
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 110px;
+}
+.container, .content, .main-content {
+    flex: 1 0 auto;
+}
+</style>
 </html>
