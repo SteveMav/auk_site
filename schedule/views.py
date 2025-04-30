@@ -315,6 +315,8 @@ def work_list(request):
     now = timezone.now() + timedelta(hours=1)
     return render(request, 'schedule/work_list.html', {'works': works, 'now': now})
 
+
+@login_required
 def all_courses_view(request):
     user = request.user
     if user.is_superuser:

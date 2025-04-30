@@ -70,7 +70,7 @@
                                 <div class="card-text mb-2 small">
                                     <div><strong>Professeur:</strong> {{ item.course.professor }}</div>
                                     <div><strong>Faculté:</strong> {{ item.course.faculty.name }}</div>
-                                    <div><strong>Horaire:</strong> {{ item.schedule.start_time }} - {{ item.schedule.end_time }}</div>
+                                    <div><strong>Horaire:</strong> {{ item.schedule.start_time|time:"H:i" }}h - {{ item.schedule.end_time|time:"H:i" }}h</div>
                                     <div><strong>Status:</strong> {{ item.course.finished|yesno:"Terminé,En cours" }}</div>
                                 </div>
                                 <div class="mt-auto d-flex flex-wrap gap-2">

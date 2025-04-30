@@ -122,14 +122,20 @@
         {% if user.is_authenticated %}
             <div>
                 {% if course_info.current_course %}
-                    <h4 class="mb-1 text-primary">Cours en cours : <span class="text-danger">{{ course_info.current_course.course.name }}</span></h4>
+                    <h4 class="mb-1 text-primary">Cours en ce moment : <span class="text-danger">{{ course_info.current_course.course.name }}</span></h4>
                     <p class="mb-2">Professeur : {{ course_info.current_course.course.professor }}</p>
-                    <p>Horaire : {{ course_info.current_course.start_time|time:"H:i" }} - {{ course_info.current_course.end_time|time:"H:i" }}</p>
+                    <p>Horaire : {{ course_info.current_course.start_time|time:"H:i" }}h - {{ course_info.current_course.end_time|time:"H:i" }}h</p>
+                    {% if course_info.next_course %}
+                        <h5 class="mt-3 mb-1 text-primary">Prochain cours :</h5>
+                        <p class="mb-1"><strong>{{ course_info.next_course.course.name }}</strong></p>
+                        <p class="mb-1">Professeur : {{ course_info.next_course.course.professor }}</p>
+                        <p>Horaire : {{ course_info.next_course.start_time|time:"H:i" }}h - {{ course_info.next_course.end_time|time:"H:i" }}h</p>
+                    {% endif %}
                 {% elif course_info.next_course %}
                     <h4 class="mb-1 text-primary">Prochain cours : <span class="text-danger">{{ course_info.next_course.course.name }}</span></h4>
                     <p class="mb-2">Professeur : {{ course_info.next_course.course.professor }}</p>
                     <p>
-                        Horaire : {{ course_info.next_course.start_time|time:"H:i" }} - {{ course_info.next_course.end_time|time:"H:i" }}
+                        Horaire : {{ course_info.next_course.start_time|time:"H:i" }}h - {{ course_info.next_course.end_time|time:"H:i" }}h
                         {% if course_info.next_course.day_of_week != now|date:'l' %}
                             <span class="badge bg-primary ms-2">{{ course_info.next_course.day_of_week }}</span>
                         {% endif %}

@@ -57,26 +57,21 @@ def get_user_courses(user):
     current_course = None
     next_course = None
     from datetime import timedelta, datetime
+    # Trouver le cours en cours et le prochain cours du jour
     for course in courses_today:
         start = datetime.combine(current_time.date(), course.start_time, tzinfo=gmt1)
         end = datetime.combine(current_time.date(), course.end_time, tzinfo=gmt1) + timedelta(minutes=1) - timedelta(seconds=1)
         now = current_time
-        if start <= now <= end:
+        if start <= now <= end and current_course is None:
             current_course = course
-            break
-    # 2. Si pas de cours en cours, cherche le prochain cours d'aujourd'hui
-    if not current_course:
-        for course in courses_today:
-            if course.start_time > current_time.time():
-                next_course = course
-                break
-    # 3. Si ni cours actuel ni prochain aujourd'hui, cherche le prochain cours tous jours confondus
+        elif course.start_time > current_time.time() and next_course is None:
+            next_course = course
+    # Si ni cours actuel ni prochain aujourd'hui, cherche le prochain cours tous jours confondus
     if not current_course and not next_course:
         all_next_courses = CourseSchedule.objects.filter(
             course__faculty=faculty,
             course__finished=False,
         ).order_by('day_of_week', 'start_time')
-        from datetime import timedelta
         weekday_to_int = {
             'Lundi': 0, 'Mardi': 1, 'Mercredi': 2, 'Jeudi': 3,
             'Vendredi': 4, 'Samedi': 5, 'Dimanche': 6
@@ -115,16 +110,9 @@ def get_user_courses(user):
             'next_course': next_course,
             'all_courses': list(courses_that_day),
         }
-    # 4. Si cours en cours, n'affiche PAS de next_course
-    if current_course:
-        return {
-            'current_course': current_course,
-            'next_course': None,
-            'all_courses': list(courses_today),
-        }
-    # 5. Sinon (pas de cours en cours mais un prochain aujourd'hui)
+    # Toujours retourner current_course ET next_course (même si l'un ou l'autre est None)
     return {
-        'current_course': None,
+        'current_course': current_course,
         'next_course': next_course,
         'all_courses': list(courses_today),
     }

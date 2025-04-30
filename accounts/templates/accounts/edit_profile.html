@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
 {% load static %}
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,6 +64,31 @@
       }
     }
 </style>
+</head>
+<body>{% if messages %}
+  <div id="toast-container" style="position: fixed; top: 30px; right: 30px; z-index: 9999;">
+    {% for message in messages %}
+      <div class="toast-message alert alert-{{ message.tags }} shadow-sm mb-2 animate__animated animate__fadeInDown">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      const toasts = document.querySelectorAll('.toast-message');
+      if (toasts.length > 0) {
+        setTimeout(() => {
+          toasts.forEach(t => t.style.opacity = '0');
+          setTimeout(() => {
+            const container = document.getElementById('toast-container');
+            if (container) container.remove();
+          }, 500);
+        }, 1000); // 1 seconde avant disparition
+      }
+    });
+  </script>
+
 {% include 'navbar.html' %}
 <div class="container px-2 px-md-0">
   <div class="row justify-content-center align-items-center min-vh-100">
@@ -124,3 +152,4 @@
   });
 </script>
 </body>
+</html>

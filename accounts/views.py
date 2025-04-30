@@ -144,6 +144,7 @@ def resend_confirmation_code(request):
 
 def login_user(request):
     form = LoginForm()
+    next_url = request.GET.get('next')
 
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -153,7 +154,6 @@ def login_user(request):
             password = form.cleaned_data.get('password')
             user = authenticate(request, username=username_or_email, password=password)
             if user is None:
-                # Essayer de trouver l'utilisateur par email
                 try:
                     user_obj = User.objects.get(email=username_or_email)
                     user = authenticate(request, username=user_obj.username, password=password)
@@ -162,11 +162,11 @@ def login_user(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, 'Connexion réussie !')
-                return redirect('main:index')
+                return redirect(next_url or 'main:index')
             else:
                 messages.error(request, 'Nom d\'utilisateur/email ou mot de passe invalide.')
 
-    return render(request, 'accounts/login.html', {'form': form})
+    return render(request, 'accounts/login.html', {'form': form, 'next': next_url})
 
     
 
