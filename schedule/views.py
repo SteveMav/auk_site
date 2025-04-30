@@ -82,7 +82,7 @@ def delete_course(request, course_id):
 @login_required
 @permission_required('schedule.add_course')
 def create_course(request):
-    days = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche')
+    days = ('Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi')
     cp_profile = None
 
     if request.user.is_superuser:
@@ -172,10 +172,9 @@ def course_list(request):
         'Jeudi': 'Jeudi',
         'Vendredi': 'Vendredi',
         'Samedi': 'Samedi',
-        'Dimanche': 'Dimanche',
     }
     
-    days_of_week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+    days_of_week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
     
     # Get courses based on user role
     if request.user.is_superuser:

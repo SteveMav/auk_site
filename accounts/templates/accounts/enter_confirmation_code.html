@@ -12,6 +12,31 @@
     <link rel="stylesheet" href="{% static 'css/auk_style.css' %}">
 </head>
 <body>
+    {% if messages %}
+  <div id="toast-container" style="position: fixed; top: 30px; right: 30px; z-index: 9999;">
+    {% for message in messages %}
+      <div class="toast-message alert alert-{{ message.tags }} shadow-sm mb-2 animate__animated animate__fadeInDown">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      const toasts = document.querySelectorAll('.toast-message');
+      if (toasts.length > 0) {
+        setTimeout(() => {
+          toasts.forEach(t => t.style.opacity = '0');
+          setTimeout(() => {
+            const container = document.getElementById('toast-container');
+            if (container) container.remove();
+          }, 500);
+        }, 1000); // 1 seconde avant disparition
+      }
+    });
+  </script>
+
+
 {% include 'navbar.html' %}
 <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
     <div class="container">
@@ -30,15 +55,6 @@
                     <form method="post">
                         {% csrf_token %}
                         
-                        {% if messages %}
-                        <div class="messages mb-3">
-                            {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}">
-                                {{ message }}
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% endif %}
 
                         <div class="mb-3">
                             {{ form.code.label_tag }}

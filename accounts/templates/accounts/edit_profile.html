@@ -109,4 +109,18 @@
   </div>
 </div>
 {% include 'footer.html' %}
+<script>
+  window.addEventListener('DOMContentLoaded', function() {
+    const toasts = document.querySelectorAll('.toast-message');
+    if (toasts.length > 0) {
+      setTimeout(() => {
+        toasts.forEach(t => t.style.opacity = '0');
+        setTimeout(() => {
+          const container = document.getElementById('toast-container');
+          if (container) container.remove();
+        }, 500);
+      }, 1000); // 1 seconde avant disparition
+    }
+  });
+</script>
 </body>

@@ -1,8 +1,10 @@
-{% load static %}
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-{% block content %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier l'horaire d'un cours</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 <style>
     body {
@@ -101,6 +103,32 @@ label.form-label {
     }
 }
 </style>
+</head>
+<body>
+    {% if messages %}
+  <div id="toast-container" style="position: fixed; top: 30px; right: 30px; z-index: 9999;">
+    {% for message in messages %}
+      <div class="toast-message alert alert-{{ message.tags }} shadow-sm mb-2 animate__animated animate__fadeInDown">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      const toasts = document.querySelectorAll('.toast-message');
+      if (toasts.length > 0) {
+        setTimeout(() => {
+          toasts.forEach(t => t.style.opacity = '0');
+          setTimeout(() => {
+            const container = document.getElementById('toast-container');
+            if (container) container.remove();
+          }, 500);
+        }, 1000); // 1 seconde avant disparition
+      }
+    });
+  </script>
+
 {% include 'navbar.html' %}
 
 <div class="container py-5 px-2 px-md-0">
@@ -151,3 +179,6 @@ label.form-label {
 </div>
 {% include 'footer.html' %}
 {% endblock %}
+</body>
+</html>
+

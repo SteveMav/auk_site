@@ -57,8 +57,6 @@ def get_user_courses(user):
     current_course = None
     next_course = None
     from datetime import timedelta, datetime
-    logger.info(f"DEBUG courses_today: {[str(c) for c in courses_today]}")
-    # 1. Cherche d'abord s'il y a un cours en cours (current_course) aujourd'hui
     for course in courses_today:
         start = datetime.combine(current_time.date(), course.start_time, tzinfo=gmt1)
         end = datetime.combine(current_time.date(), course.end_time, tzinfo=gmt1) + timedelta(minutes=1) - timedelta(seconds=1)
@@ -133,7 +131,6 @@ def get_user_courses(user):
 
 def index(request):
     course_info = get_user_courses(request.user)
-    print(course_info)
     latest_news = News.objects.all()[:3]
     return render(request, 'home/index.html', {
         'course_info': course_info,
@@ -164,28 +161,3 @@ def all_students_view(request):
         'students_total': students_total,
     })
 
-# from pprint import pprint
-
-# def index(request):
-#     course_info = get_user_courses(request.user)
-#     latest_news = News.objects.all()[:3]
-
-#     # DEBUG : Afficher tous les CourseSchedule du jour
-#     current_time = timezone.localtime()
-#     current_weekday = current_time.strftime('%A')
-#     all_sched = CourseSchedule.objects.filter(day_of_week=current_weekday)
-#     print(f"DEBUG - Schedules pour {current_weekday}:")
-#     for sched in all_sched:
-#         print(f"  - {sched} | faculty: {sched.course.faculty} | finished: {sched.course.finished}")
-
-#     # DEBUG : Afficher student + faculty
-#     if request.user.is_authenticated:
-#         try:
-#             print(f"DEBUG - Student: {request.user.student} | faculty: {request.user.student.faculty}")
-#         except Exception as e:
-#             print(f"DEBUG - Pas de student pour user: {e}")
-
-#     return render(request, 'home/index.html', {
-#         'course_info': course_info,
-#         'latest_news': latest_news,
-#     })

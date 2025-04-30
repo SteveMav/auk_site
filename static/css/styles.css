@@ -163,6 +163,18 @@ body {
 /* =============================
    Utilities
    ============================= */
+
+.toast-message {
+  min-width: 220px;
+  max-width: 350px;
+  font-size: 1rem;
+  border-radius: 0.7rem;
+  opacity: 0.97;
+  transition: opacity 0.4s;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  z-index: 9999;
+}
+
 .us-ribbon {
     background: repeating-linear-gradient(90deg, #bf0a30, #bf0a30 10px, #fff 10px, #fff 20px, #002868 20px, #002868 30px);
     height: 6px;
