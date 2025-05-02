@@ -14,10 +14,11 @@
 <body>
     <div class="container">
         <h2>Bonjour {{ user.first_name|default:user.username }},</h2>
-        <p>L'horaire d'un cours de votre faculté a été modifié :</p>
+        <p>L'horaire d'un cours de ta faculté a été modifié :</p>
         <h3>{{ course.name }}</h3>
-        <p><strong>Semestre :</strong> {{ course.semester }}</p>
-        <p><strong>Enseignant :</strong> {{ course.teacher }}</p>
+        {% if schedule_info %}
+        <p><strong>Horaire modifié :</strong> {{ schedule_info }}</p>
+        {% endif %}
         <a class="btn" href="{{ course_url }}">Voir le cours</a>
         <div class="footer">
             <p>Cet email vous est envoyé automatiquement par l'AUK.</p>

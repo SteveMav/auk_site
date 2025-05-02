@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import NewsForm, EventForm
 from .models import News, Event
 from .email_utils import send_news_email, send_event_email
+from django.shortcuts import get_object_or_404
+
 
 # Create your views here.
 
@@ -48,7 +50,6 @@ def views_news(request):
     news = News.objects.all()
     return render(request, 'event_news/news.html', {'news': news})
 
-from django.shortcuts import get_object_or_404
 
 @login_required
 def news_detail(request, news_id):

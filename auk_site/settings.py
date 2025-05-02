@@ -138,8 +138,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.mailersend.net'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'auketudiants@gmail.com'  # À remplacer par votre email
-EMAIL_HOST_PASSWORD = 'yodyoahnqnycpmtd'  # À remplacer par votre mot de passe d'application
+EMAIL_HOST_USER = 'MS_kkkFLI@test-3m5jgrookpmgdpyo.mlsender.net'  # À remplacer par votre email
+EMAIL_HOST_PASSWORD = 'mssp.D95aBXi.351ndgwyej5lzqx8.RCeyVks'  # À remplacer par votre mot de passe d'application

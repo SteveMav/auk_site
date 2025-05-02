@@ -40,7 +40,7 @@
     <div class="us-ribbon" style="background: repeating-linear-gradient(90deg, #bf0a30, #bf0a30 10px, #fff 10px, #fff 20px, #002868 20px, #002868 30px); height: 6px; border-radius: 3px; margin: 0 auto 1.5rem auto; width: 120px;"></div>
     <div class="register-box animate__animated animate__fadeInDown" style="background:rgba(255,255,255,0.97);border-radius:1rem;box-shadow:0 6px 36px rgba(0,0,0,0.07);margin:3rem auto;max-width:420px;padding:2.5rem 2rem 2rem 2rem;animation:fadeInDown 1s;">
         <h2>Bonjour {{ user.first_name|default:user.username }},</h2>
-        <p>Un nouveau cours a été ajouté à l'horaire de votre faculté :</p>
+        <p>Un nouveau cours a été ajouté à l'horaire de ta faculté :</p>
         <h3>{{ course.name }}</h3>
         <p><strong>Jours :</strong> {{ schedule_info }}</p>
         <p><strong>Nombre d'heures :</strong> {{ course.total_hours }}H</p>

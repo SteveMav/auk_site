@@ -8,83 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-        {% comment %} body {
-            background: linear-gradient(135deg, #002868 0%, #ffffff 50%, #bf0a30 100%);
-            min-height: 100vh;
-        }
-        .navbar {
-            background: #002868;
-        }
-        .navbar-brand, .nav-link, .navbar-nav .nav-link.active {
-            color: #fff !important;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-        .navbar-nav .nav-link:hover {
-            color: #bf0a30 !important;
-            transition: color .3s;
-        }
-        .hero {
-            background: rgba(255,255,255,0.95);
-            border-radius: 1rem;
-            box-shadow: 0 6px 36px rgba(0,0,0,0.07);
-            margin-top: 2rem;
-            padding: 2rem 1.5rem;
-            text-align: center;
-            animation: fadeInDown 1s;
-        }
-        .hero-title {
-            color: #002868;
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
-        .hero-subtitle {
-            color: #bf0a30;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
-        .news-section {
-            margin-top: 2.5rem;
-            animation: fadeInUp 1.2s;
-        }
-        .news-card {
-            transition: transform .3s, box-shadow .3s;
-        }
-        .news-card:hover {
-            transform: translateY(-8px) scale(1.03);
-            box-shadow: 0 8px 32px rgba(191,10,48,0.15);
-        }
-        .footer {
-            background: #002868;
-            color: #fff;
-            padding: 2rem 0 1rem 0;
-            margin-top: 3rem;
-            border-top: 4px solid #bf0a30;
-        }
-        .footer a {
-            color: #fff;
-            margin: 0 .5rem;
-            font-size: 1.3rem;
-        }
-        .footer a:hover {
-            color: #bf0a30;
-        }
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: none; }
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: none; }
-        }
-        .us-ribbon {
-            background: repeating-linear-gradient(90deg, #bf0a30, #bf0a30 10px, #fff 10px, #fff 20px, #002868 20px, #002868 30px);
-            height: 6px;
-            border-radius: 3px;
-            margin: 0 auto 1.5rem auto;
-            width: 120px;
-        }
-    </style> {% endcomment %}
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo-auk.png' %}">
+
 </head>
 <body class="d-flex flex-column min-vh-100">
 {% if messages %}
@@ -158,15 +83,15 @@
 
             <div class="alert alert-info shadow-sm p-4 mb-4 auk-custom-alert">
                 <h5 class="fw-semibold mb-2"><i class="bi bi-info-circle"></i> Découvrez la plateforme AUK&nbsp;!</h5>
-                <p class="mb-1">Gérez facilement vos cours, accédez à votre emploi du temps, consultez les dernières actualités du campus et restez connecté à la communauté universitaire.</p>
-                <p class="mb-1">Créez un compte pour&nbsp;:</p>
+                <p class="mb-1">Géres facilement tes cours, accédes à ton emploi du temps, consultes les dernières actualités du campus et restes connecté à la communauté universitaire.</p>
+                <p class="mb-1">Crées un compte pour&nbsp;:</p>
                 <ul class="mb-2">
                     <li>Voir et télécharger les supports de cours</li>
                     <li>Suivre votre planning et vos devoirs</li>
                     <li>Recevoir les annonces importantes</li>
                     <li>Participer à la vie du campus en ligne</li>
                 </ul>
-                <a href="/register/" class="btn btn-primary btn-sm">Inscrivez-vous maintenant</a>
+                <a href="/accounts/register/" class="btn btn-primary btn-sm">Inscris-toi maintenant</a>
             </div>
             {%endif%}
         </div>
@@ -176,15 +101,19 @@
         <h3 class="mb-4 text-center text-primary">Dernières News</h3>
         <div class="row g-4">
             {% for news in latest_news %}
-                <div class="col-md-4">
+            <div class="col-md-4">
+                <a href="{% url 'event_news:news_detail' news.id %}" class="text-decoration-none">
                     <div class="card news-card h-100 animate__animated animate__fadeInUp">
-                        <img src="{{ news.image.url }}" class="card-img-top" alt="news{{ forloop.counter }}">
+                        {% if news.image %}
+                            <img src="{{ news.image.url }}" class="card-img-top" alt="{{ news.title }}">
+                        {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ news.title }}</h5>
-                            <p class="card-text">{{ news.content }}</p>
+                            <p class="card-text">{{ news.content|truncatechars:100 }}</p>
                         </div>
                     </div>
-                </div>
+                </a>
+            </div>
             {% endfor %}
         </div>
     </div>

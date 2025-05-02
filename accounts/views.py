@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.urls import reverse
 from .forms import RegistrationForm, LoginForm, ConfirmationCodeForm, UserProfileForm
 from .models import PendingRegistration, UserProfile
+from django.contrib.auth.decorators import permission_required, login_required
 
 def register(request):
     if request.method == 'POST':
@@ -171,7 +172,7 @@ def login_user(request):
     
 
 
-
+@login_required
 def edit_profile(request):
     user_profile = UserProfile.objects.get(user=request.user)
     if request.method == 'POST':

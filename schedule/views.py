@@ -8,11 +8,17 @@ from django.utils import timezone
 from .models import Course, CourseSchedule, Work, CPProfile, CourseFile, Exam
 from .forms import CourseForm, CourseScheduleForm, WorkForm, CourseFileForm, CourseFileMultipleForm, ExamForm
 from django.template.loader import render_to_string
+from django.template import RequestContext
 import json
 from accounts.models import UserProfile
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST
 from datetime import timedelta
+import os
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+from accounts.models import UserProfile
 
 @login_required
 @permission_required('schedule.add_coursefile')
@@ -75,9 +81,14 @@ def delete_course(request, course_id):
                 return HttpResponseForbidden("Vous ne pouvez supprimer que les cours de votre propre faculté.")
         except CPProfile.DoesNotExist:
             return HttpResponseForbidden("Accès non autorisé.")
+    # Supprimer tous les fichiers physiques associés au cours
+    for file in course.files.all():
+        if file.file and hasattr(file.file, 'path') and os.path.isfile(file.file.path):
+            os.remove(file.file.path)
+        file.delete()
     course.delete()
     messages.success(request, f'Le cours "{course.name}" a été supprimé avec succès.')
-    return redirect('schedule:course_list')
+    return redirect('schedule:all_courses')
 
 @login_required
 @permission_required('schedule.add_course')
@@ -185,7 +196,6 @@ def course_list(request):
         cp_profile = CPProfile.objects.get(user=request.user)
         courses = Course.objects.filter(faculty=cp_profile.faculty).prefetch_related('courseschedule_set')
     
-    # Organize courses by day
     courses_by_day = {day: [] for day in days_of_week}
     
     for course in courses:
@@ -228,7 +238,7 @@ def edit_schedule(request, schedule_id):
             form.save()
             messages.success(request, 'Horaire modifié avec succès.')
             from .email_utils import send_course_updated_email
-            send_course_updated_email(course, request)
+            send_course_updated_email(course, request, schedule=schedule)
             return redirect('schedule:course_list')
     else:
         form = CourseScheduleForm(instance=schedule)
@@ -268,12 +278,7 @@ def create_work(request):
         form = WorkForm(request.POST, request.FILES, faculty=request.user.cpprofile.faculty if hasattr(request.user, 'cpprofile') else None)
         if form.is_valid():
             work = form.save()
-            # Envoi d'un mail à tous les étudiants de la faculté du TP
-            from django.core.mail import send_mail
-            from django.template.loader import render_to_string
-            from django.conf import settings
-            from accounts.models import UserProfile
-            # Récupérer tous les étudiants de la faculté du cours du TP
+            # Envoi d'un mail à tous les étudiants de la faculté du TP            # Récupérer tous les étudiants de la faculté du cours du TP
             faculty = work.course.faculty
             students = UserProfile.objects.filter(faculty=faculty, user__is_active=True, user__email__isnull=False)
             recipient_list = [s.user.email for s in students if s.user.email]
@@ -362,6 +367,21 @@ def exam_list(request):
 
 
 @login_required
+def ajax_course_file_list_partial(request, course_id):
+    """
+    Vue qui retourne juste le HTML de la liste des fichiers d'un cours (pour AJAX).
+    """
+    course = get_object_or_404(Course, id=course_id)
+    # Pour que perms fonctionne dans le template, il suffit de passer le contexte standard
+    context = {'course': course}
+    html = render_to_string('schedule/course_file_modal.html', context | {'course': course, 'request': request})
+    # On extrait juste la liste <ul>...</ul> du HTML généré (pour éviter d'envoyer toute la modale)
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, 'html.parser')
+    file_list = soup.find('ul', {'id': f'file-list-{course.id}'})
+    return JsonResponse({'html': str(file_list)}, safe=False)
+
+@login_required
 @permission_required('schedule.add_coursefile')
 def ajax_upload_course_file(request, course_id):
     if request.method == 'POST' and request.FILES.get('file'):
@@ -369,9 +389,7 @@ def ajax_upload_course_file(request, course_id):
         file = request.FILES['file']
         description = request.POST.get('description', '')
         CourseFile.objects.create(course=course, file=file, description=description)
-        files = course.files.all()
-        file_list_html = render_to_string('schedule/partials/course_file_list.html', {'course': course, 'files': files, 'user': request.user, 'perms': request.user.get_all_permissions()})
-        return JsonResponse({'file_list_html': file_list_html})
+        return JsonResponse({'success': True})
     return JsonResponse({'error': 'Erreur lors de l\'upload.'}, status=400)
 
 
@@ -381,9 +399,12 @@ def ajax_delete_course_file(request, file_id):
     if request.method == 'POST':
         file = get_object_or_404(CourseFile, id=file_id)
         course = file.course
+        
+        # Supprimer le fichier physique
+        if file.file:
+            if os.path.isfile(file.file.path):
+                os.remove(file.file.path)
+        
         file.delete()
-        files = course.files.all()
-        file_list_html = render_to_string('schedule/partials/course_file_list.html', {'course': course, 'files': files, 'user': request.user, 'perms': request.user.get_all_permissions()})
-        return JsonResponse({'file_list_html': file_list_html})
+        return JsonResponse({'success': True})
     return JsonResponse({'error': 'Erreur lors de la suppression.'}, status=400)
-

@@ -11,7 +11,7 @@
           {% for file in course.files.all %}
             <li class="list-group-item d-flex justify-content-between align-items-center" data-file-id="{{ file.id }}">
               <span>
-                <a href="{{ file.file.url }}" download target="_blank">{{ file.file.name|basename }}</a>
+                <a href="{{ file.file.url }}" download target="_blank">{{ file.filename|default:file.file.name|default:"Document"|truncatechars:30 }}</a>
                 {% if file.description %}<br><small>{{ file.description }}</small>{% endif %}
               </span>
               {% if perms.schedule.delete_coursefile %}
@@ -44,6 +44,19 @@
 <!-- jQuery obligatoire pour le JS AJAX -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+function refreshFileList(courseId, $form) {
+  var $list = $('#file-list-' + courseId);
+  $list.html('<li class="list-group-item text-center"><span class="spinner-border spinner-border-sm text-primary"></span> Chargement...</li>');
+  $.get('/schedule/course/' + courseId + '/files/partial_list/', function(data) {
+    if (data && data.html) {
+      $list.html(data.html);
+    }
+    if ($form) {
+      $form.find('button[type=submit]').prop('disabled', false).text('Ajouter un PDF');
+    }
+  });
+}
+
 $(function() {
   // Évite la double attache du handler
   $(document).off('submit', '.upload-file-form');
@@ -64,10 +77,16 @@ $(function() {
       contentType: false,
       headers: {'X-CSRFToken': $form.find('[name=csrfmiddlewaretoken]').val()},
       success: function(response) {
-        $('#file-list-' + courseId).html(response.file_list_html);
-        $form[0].reset();
-        $form.find('button[type=submit]').prop('disabled', false).text('Ajouter un PDF');
-        $form.find('.upload-error').remove();
+        if (response.success) {
+          // Rafraîchir la liste des fichiers sans recharger la page
+          refreshFileList(courseId, $form);
+          $form[0].reset();
+        } else {
+          var msg = response.error || 'Erreur lors de l\'upload.';
+          $form.find('.upload-error').remove();
+          $form.append('<div class="upload-error text-danger mt-2">'+msg+'</div>');
+          $form.find('button[type=submit]').prop('disabled', false).text('Ajouter un PDF');
+        }
       },
       error: function(xhr) {
         var msg = 'Erreur lors de l\'upload.';
@@ -90,7 +109,12 @@ $(function() {
       type: 'POST',
       headers: {'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').first().val()},
       success: function(response) {
-        $('#file-list-' + courseId).html(response.file_list_html);
+        if (response.success) {
+          // Rafraîchir la liste des fichiers sans recharger la page
+          refreshFileList(courseId);
+        } else {
+          alert(response.error || 'Erreur lors de la suppression.');
+        }
       },
       error: function(xhr) {
         alert('Erreur lors de la suppression.');

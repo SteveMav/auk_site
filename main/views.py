@@ -6,6 +6,8 @@ from event_news.models import News
 from accounts.models import UserProfile
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Count, Q
+import logging
+
 
 
 def get_user_courses(user):
@@ -15,7 +17,6 @@ def get_user_courses(user):
       - next_course : le prochain cours de la journée (None si aucun)
       - all_courses : tous les cours du jour (ordre horaire)
     """
-    import logging
     logger = logging.getLogger("main.views")
 
     if not user.is_authenticated:
@@ -24,7 +25,6 @@ def get_user_courses(user):
     from datetime import timezone as dt_timezone, timedelta
     gmt1 = dt_timezone(timedelta(hours=1))
     current_time = timezone.now().astimezone(gmt1)
-    print(current_time)
     # Conversion du jour anglais en français
     weekday_en_to_fr = {
         'Monday': 'Lundi',

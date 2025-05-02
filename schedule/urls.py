@@ -5,6 +5,7 @@ app_name = 'schedule'
 
 urlpatterns = [
      path('', views.course_list, name='course_list'),
+     path('course/<int:course_id>/files/partial_list/', views.ajax_course_file_list_partial, name='ajax_course_file_list_partial'),
      path('course/<int:course_id>/delete/', views.delete_course, name='delete_course'),
      path('schedule/<int:schedule_id>/delete/', views.delete_schedule, name='delete_schedule'),
      path('create_course/', views.create_course, name='create_course'),
