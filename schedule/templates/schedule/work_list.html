@@ -65,15 +65,15 @@
         <div class="row justify-content-center mx-auto">
             {% for work in works %}
             <div class="col-xl-5 col-lg-6 col-md-8 col-12 mt-3">
-                <div class="card tp-card h-100 {% if work.due_date < now %}grayscale{% endif %}">
+                <div class="card tp-card h-100 {% if work.due_date < now %}grayscale{% else %}bg-success bg-opacity-10{% endif %}">
                     <div class="card-body p-4">
                         <div class="d-flex align-items-center mb-3">
                             <i class="bi bi-file-earmark-text me-2 fs-2" style="color:#002868;"></i>
-                            <h4 class="card-title mb-0 tp-title">{{ work.title }}</h4>
+                            <h4 class="card-title mb-0 tp-title {% if work.due_date < now %}text-muted{% else %}text-success{% endif %}">{{ work.title }}</h4>
                         </div>
-                        <h6 class="card-subtitle mb-3 text-muted">{{ work.course.name }}</h6>
+                        <h6 class="card-subtitle mb-3 {% if work.due_date < now %}text-muted{% else %}text-danger{% endif %}">{{ work.course.name }}</h6>
                         <div class="mb-2">
-                            <span class="badge rounded-pill bg-secondary px-3 py-2">{{ work.type }}</span>
+                            <span class="badge rounded-pill {% if work.due_date < now %}bg-secondary{% else %}bg-success{% endif %} px-3 py-2">{{ work.type }}</span>
                         </div>
                         <div class="mb-3">
                             <strong>Description :</strong>
@@ -81,12 +81,12 @@
                         </div>
                         <div class="mb-4">
                             <strong>À rendre pour le :</strong>
-                            <span class="{% if work.due_date|date:'YmdHi' < now|date:'YmdHi' %}text-danger fw-bold{% endif %}">
+                            <span class="{% if work.due_date < now %}text-muted{% else %}text-success fw-bold{% endif %}">
                                 {{ work.due_date|date:"d F Y à H:i" }}
                             </span>
                         </div>
                         {% if work.file %}
-                        <a href="{{ work.file.url }}" class="btn btn-success btn-lg w-100 mb-2 shadow-sm" download>
+                        <a href="{{ work.file.url }}" class="btn btn-success btn-lg w-100 mb-2 shadow-sm {% if work.due_date < now %}disabled{% endif %}" download>
                             <i class="bi bi-file-earmark-arrow-down me-1"></i> Télécharger le PDF du travail
                         </a>
                         {% endif %}
