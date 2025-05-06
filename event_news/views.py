@@ -5,9 +5,7 @@ from .forms import NewsForm, EventForm
 from .models import News, Event
 from .email_utils import send_news_email, send_event_email
 from django.shortcuts import get_object_or_404
-
-
-# Create your views here.
+from django.urls import reverse
 
 @login_required
 def add_content(request):
@@ -21,7 +19,7 @@ def add_content(request):
                 news = news_form.save(commit=False)
                 news.created_by = request.user
                 news.save()
-                send_news_email(news, request)
+                # send_news_email(news, request)
                 messages.success(request, 'News ajoutée avec succès!')
                 return redirect('event_news:add_content')
             else:
@@ -33,7 +31,7 @@ def add_content(request):
                 event = event_form.save(commit=False)
                 event.created_by = request.user
                 event.save()
-                send_event_email(event, request)
+                # send_event_email(event, request)
                 messages.success(request, 'Événement créé avec succès!')
                 return redirect('event_news:add_content')
             else:
@@ -50,8 +48,8 @@ def views_news(request):
     news = News.objects.all()
     return render(request, 'event_news/news.html', {'news': news})
 
-
 @login_required
 def news_detail(request, news_id):
     news = get_object_or_404(News, id=news_id)
     return render(request, 'event_news/news_detail.html', {'news': news})
+

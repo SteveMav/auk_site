@@ -2,7 +2,7 @@
    Layout & General
    ============================= */
 body {
-    background: linear-gradient(135deg, #002868 0%, #ffffff 50%, #bf0a30 100%);
+    background-color: rgba(243,243,265,0.97);
     min-height: 100vh;
 }
 
