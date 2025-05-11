@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import models
 from .forms import NewsForm, EventForm
 from .models import News, Event
 from .email_utils import send_news_email, send_event_email
@@ -19,8 +20,13 @@ def add_content(request):
                 news = news_form.save(commit=False)
                 news.created_by = request.user
                 news.save()
-                # send_news_email(news, request)
+                
+                # Sauvegarder les relations many-to-many après avoir sauvegardé l'objet
+                news_form.save_m2m()
+                
+                # Envoyer l'email aux utilisateurs concernés
                 messages.success(request, 'News ajoutée avec succès!')
+                send_news_email(news, request)
                 return redirect('event_news:add_content')
             else:
                 messages.error(request, 'Erreur dans le formulaire de news.')
@@ -45,7 +51,32 @@ def add_content(request):
 
 @login_required
 def views_news(request):
-    news = News.objects.all()
+    # Récupérer la faculté de l'utilisateur connecté
+    from accounts.models import UserProfile
+    try:
+        user_profile = UserProfile.objects.get(user=request.user)
+        user_faculty = user_profile.faculty
+    except UserProfile.DoesNotExist:
+        user_faculty = None
+    
+    # Créer la requête de base pour les news
+    base_query = News.objects.all()
+    
+    # Toujours inclure les news publiques, quel que soit l'utilisateur
+    conditions = models.Q(is_public=True)
+    
+    # Si l'utilisateur a une faculté, ajouter les news ciblées pour cette faculté
+    if user_faculty:
+        conditions |= models.Q(target_faculties=user_faculty)
+    
+    # Appliquer les filtres et ordonner par date de création (plus récentes d'abord)
+    news = base_query.filter(conditions).distinct().order_by('-created_at')
+    
+    # Journaliser le nombre de news trouvées pour debug
+    print(f"Nombre de news trouvées pour l'utilisateur {request.user}: {news.count()}")
+    if user_faculty:
+        print(f"Faculté de l'utilisateur: {user_faculty.name}")
+    
     return render(request, 'event_news/news.html', {'news': news})
 
 @login_required

@@ -32,28 +32,39 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="/">AUK</a>
+        <a class="navbar-brand" href="/">AUKETUDIANT</a>
     </div>
 </nav>
 <div class="container">
     <div class="us-ribbon" style="background: repeating-linear-gradient(90deg, #bf0a30, #bf0a30 10px, #fff 10px, #fff 20px, #002868 20px, #002868 30px); height: 6px; border-radius: 3px; margin: 0 auto 1.5rem auto; width: 120px;"></div>
     <div class="register-box animate__animated animate__fadeInDown" style="background:rgba(255,255,255,0.97);border-radius:1rem;box-shadow:0 6px 36px rgba(0,0,0,0.07);margin:3rem auto;max-width:420px;padding:2.5rem 2rem 2rem 2rem;animation:fadeInDown 1s;">
     <div class="container">
-        <h2>Nouvelle actualité sur AUK</h2>
+        <h2>Nouvelle actualité sur AUKETUDIANT</h2>
         <p>Bonjour {{ user.first_name|default:user.username }},</p>
-        <p>Une nouvelle actualité vient d'être publiée sur le site de l'AUK :</p>
+        <p>Une nouvelle actualité vient d'être publiée sur AUKETUDIANT :</p>
         <h3>{{ news.title }}</h3>
         <p>{{ news.summary|default:news.content|truncatechars:120 }}</p>
+        
+        {% if news.is_public %}
+        <p><small style="background-color: #198754; color: white; padding: 3px 8px; border-radius: 4px;">Visible par tous</small></p>
+        {% elif news.target_faculties.all %}
+        <p>
+            <small style="background-color: #0d6efd; color: white; padding: 3px 8px; border-radius: 4px;">Facultés ciblées:</small>
+            {% for faculty in news.target_faculties.all %}
+                <small style="background-color: #f8f9fa; color: #212529; padding: 2px 6px; border-radius: 4px; margin-left: 3px;">{{ faculty.name }}</small>
+            {% endfor %}
+        </p>
+        {% endif %}
         <a class="button" href="{{ news_url }}">Voir la news</a>
         <div class="footer">
-            <p>Cet email vous est envoyé automatiquement par l'AUK.</p>
+            <p>Cet email vous est envoyé automatiquement par la coordination étudiante AUK.</p>
             <p>Si tu n'as pas demandé à recevoir ces notifications, tu peux ignorer cet email.</p>
         </div>
     </div>
 </div>
 <footer class="footer mt-5">
     <div class="container text-center">
-        <div class="mb-2">Contact : info@auk.edu.kw | +243 900 824 429</div>
+        <div class="mb-2">Contact : info@auketudiant.com | +243 900 824 429</div>
         <div>&copy; 2025 Coordination estudiantine AUK. All rights reserved.</div>
     </div>
 </footer>

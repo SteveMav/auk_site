@@ -33,7 +33,23 @@
     <div class="meta">
         <i class="bi bi-person-circle"></i> {{ news.created_by }} &nbsp;|&nbsp;
         <i class="bi bi-calendar-event"></i> {{ news.created_at|date:'d/m/Y H:i' }}
+        {% comment %} {% if news.is_public %}
+            &nbsp;|&nbsp; <span class="badge bg-success"><i class="bi bi-globe"></i> Visible par tous</span>
+        {% elif news.target_faculties.all %}
+            &nbsp;|&nbsp; <span class="badge bg-primary"><i class="bi bi-building"></i> Facultés ciblées</span>
+        {% endif %} {% endcomment %}
     </div>
+    
+    {% if news.target_faculties.all and not news.is_public %}
+    <div class="mb-3">
+        <small class="text-muted">Cette news est destinée aux facultés suivantes :</small>
+        <div class="mt-1">
+            {% for faculty in news.target_faculties.all %}
+                <span class="badge bg-light text-dark me-1 mb-1">{{ faculty.name }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
     <div class="mb-3">
         {{ news.content|linebreaks }}
     </div>

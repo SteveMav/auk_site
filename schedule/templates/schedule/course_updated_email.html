@@ -19,9 +19,9 @@
         {% if schedule_info %}
         <p><strong>Horaire modifié :</strong> {{ schedule_info }}</p>
         {% endif %}
-        <a class="btn" href="{{ course_url }}">Voir le cours</a>
+        <a class="btn" href="{% url 'schedule:all_courses' %}">Voir le cours</a>
         <div class="footer">
-            <p>Cet email vous est envoyé automatiquement par l'AUK.</p>
+            <p>Cet email vous est envoyé automatiquement par la coordination étudiante AUK.</p>
         </div>
     </div>
 </body>

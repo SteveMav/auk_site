@@ -11,10 +11,6 @@
     <link rel="icon" type="image/x-icon" href="{% static 'img/logo-auk.png' %}">
 
     <style>
-        body {
-            background: linear-gradient(135deg, #002868 0%, #ffffff 50%, #bf0a30 100%);
-            min-height: 100vh;
-        }
         .main-content {
             background: rgba(255,255,255,0.97);
             border-radius: 1rem;
@@ -84,6 +80,13 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ news_item.title }}</h5>
                     <p class="card-text">{{ news_item.content|truncatechars:120 }}</p>
+                    <div class="mt-2">
+                        {% if news_item.is_public %}
+                            <span class="badge bg-success"><i class="bi bi-globe"></i> Visible par tous</span>
+                        {% elif news_item.target_faculties.all %}
+                            <span class="badge bg-primary"><i class="bi bi-building"></i> Facultés ciblées</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="card-footer bg-white border-0">
                     <a href="{% url 'event_news:news_detail' news_item.id %}" class="btn btn-outline-primary btn-sm">Voir détails <i class="bi bi-arrow-right"></i></a>

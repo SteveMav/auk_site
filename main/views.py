@@ -119,7 +119,52 @@ def get_user_courses(user):
 
 def index(request):
     course_info = get_user_courses(request.user)
-    latest_news = News.objects.all()[:3]
+    
+    # Initialize latest_news as an empty list
+    latest_news = []
+    
+    # Get the user's faculty if authenticated
+    user_faculty = None
+    if request.user.is_authenticated:
+        try:
+            from accounts.models import UserProfile
+            user_profile = UserProfile.objects.get(user=request.user)
+            user_faculty = user_profile.faculty
+        except UserProfile.DoesNotExist:
+            user_faculty = None
+    
+    # Get current time for comparison
+    from django.utils import timezone
+    current_time = timezone.now()
+    one_week_ago = current_time - timedelta(days=7)
+    
+    # If user has a faculty, get the latest news for that faculty from the past week
+    if user_faculty:
+        faculty_news = News.objects.filter(
+            target_faculties=user_faculty,
+            created_at__gte=one_week_ago
+        ).order_by('-created_at').first()
+        
+        if faculty_news:
+            latest_news.append(faculty_news)
+    
+    # Get 2 public news (or 3 if no faculty news was found)
+    public_news_count = 3 - len(latest_news)  # Either 2 or 3
+    
+    # Exclude any faculty news already added to avoid duplicates
+    exclude_ids = [news.id for news in latest_news]
+    public_news = News.objects.filter(
+        is_public=True
+    )
+    
+    if exclude_ids:
+        public_news = public_news.exclude(id__in=exclude_ids)
+    
+    public_news = public_news.order_by('-created_at')[:public_news_count]
+    
+    # Combine the news lists
+    latest_news.extend(public_news)
+    
     return render(request, 'home/index.html', {
         'course_info': course_info,
         'latest_news': latest_news,

@@ -33,7 +33,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="/">AUK</a>
+        <a class="navbar-brand" href="/">AUKETUDIANT</a>
     </div>
 </nav>
 <div class="container">
@@ -43,17 +43,19 @@
         <p>Un nouveau cours a été ajouté à l'horaire de ta faculté :</p>
         <h3>{{ course.name }}</h3>
         <p><strong>Jours :</strong> {{ schedule_info }}</p>
+        {% if course.total_hours %}
         <p><strong>Nombre d'heures :</strong> {{ course.total_hours }}H</p>
-        <a class="button" href="{{ course_url }}">Voir le cours</a>
+        {% endif %}
+        <a class="button" href="{% url 'schedule:all_courses' %}">Voir le cours</a>
         <div class="footer">
-            <p>Cet email vous est envoyé automatiquement par l'AUK.</p>
+            <p>Cet email vous est envoyé automatiquement par la coordination étudiante AUK.</p>
         </div>
     </div>
 </div>
 <footer class="footer mt-5">
     <div class="container text-center">
-        <div class="mb-2">Contact : info@auk.edu.kw | +243 900 824 429</div>
-        <div>&copy; 2025 Coordination estudiantine AUK. All rights reserved.</div>
+        <div class="mb-2">Contact : info@auketudiant.com | +243 900 824 429</div>
+        <div>&copy; 2025 Coordination étudiante AUK. All rights reserved.</div>
     </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
