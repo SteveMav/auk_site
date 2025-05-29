@@ -75,7 +75,14 @@
         <div class="col-md-6 mb-4">
             <div class="card news-card h-100">
                 {% if news_item.image %}
-                <img src="{{ news_item.image.url }}" class="card-img-top" alt="Image de l'actualité">
+                  {% if news_item.image.url|lower|slice:"-4:" == ".pdf" %}
+
+                    <a href="{{ news_item.image.url }}" class="btn btn-primary btn-lg w-100 mb-2 shadow-sm" download>
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Télécharger le PDF de l'actualité
+                    </a>
+                    {% else %}
+                    <img src="{{ news_item.image.url }}" class="card-img-top" alt="Image de l'actualité">
+                    {% endif %}
                 {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ news_item.title }}</h5>

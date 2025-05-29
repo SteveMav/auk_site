@@ -17,7 +17,7 @@ class Event(models.Model):
 class News(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
-    image = models.ImageField(upload_to='news_images/', blank=True, null=True)
+    image = models.FileField(upload_to='news_images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     target_faculties = models.ManyToManyField(Faculty, related_name='news', blank=True)
