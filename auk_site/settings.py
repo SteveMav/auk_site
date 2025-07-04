@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'task',
     'main',
     'accounts',
+    'librairy',
 ]
 
 MIDDLEWARE = [
