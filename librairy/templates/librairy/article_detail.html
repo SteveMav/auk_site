@@ -81,9 +81,50 @@
                 </div>
                 {% endif %}
 
-                <div class="article-content">
+                <div class="article-content mb-4">
                     {{ article.content|linebreaks }}
                 </div>
+
+                <!-- Section Fichier attaché -->
+                {% if article.files %}
+                <div class="card border-0 shadow-sm mb-5">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-paperclip me-2"></i>Fichier attaché
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                {% with file_extension=article.files.url|slice:'-4:'|lower %}
+                                    {% if file_extension in '.pdf' %}
+                                        <i class="far fa-file-pdf fa-3x text-danger"></i>
+                                    {% elif file_extension in '.doc,.docx' %}
+                                        <i class="far fa-file-word fa-3x text-primary"></i>
+                                    {% elif file_extension in '.xls,.xlsx' %}
+                                        <i class="far fa-file-excel fa-3x text-success"></i>
+                                    {% elif file_extension in '.ppt,.pptx' %}
+                                        <i class="far fa-file-powerpoint fa-3x text-warning"></i>
+                                    {% elif file_extension in '.jpg,.jpeg,.png,.gif' %}
+                                        <i class="far fa-file-image fa-3x text-info"></i>
+                                    {% else %}
+                                        <i class="far fa-file-alt fa-3x text-secondary"></i>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ article.files.name|slice:"9:"|truncatechars:40 }}</h6>
+                                <p class="text-muted small mb-2">
+                                    Taille : {{ article.files.size|filesizeformat }}
+                                </p>
+                                <a href="{{ article.files.url }}" class="btn btn-primary btn-sm" download>
+                                    <i class="fas fa-download me-1"></i>Télécharger
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </article>
 
             <!-- Articles similaires -->

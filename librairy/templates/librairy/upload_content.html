@@ -1,0 +1,482 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo-auk.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .form-header {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-header h2 {
+            color: #2d3748;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        /* Amélioration de la visibilité des icônes */
+        .nav-link i, .form-header i {
+            color: #3182ce; /* Couleur bleue pour les icônes */
+            margin-right: 0.5rem;
+        }
+        
+        /* Style pour les onglets de navigation principaux */
+        .nav-tabs {
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Style pour les champs de formulaire */
+        .file-info {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 0.25rem;
+            border: 1px solid #e9ecef;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 1rem;
+            border-radius: 5px;
+            display: none;
+        }
+        #previewArticleImage, #previewBookImage {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 1rem;
+            border-radius: 5px;
+            display: none;
+        }
+        .nav-tabs .nav-link {
+            color: #4a5568; /* Couleur de texte plus foncée pour meilleure visibilité */
+            border: 1px solid transparent;
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+            font-weight: 500; /* Texte en gras */
+            transition: all 0.2s ease;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: #2d3748; /* Couleur plus foncée au survol */
+            border-color: #e2e8f0 #e2e8f0 #dee2e6;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: #1a365d; /* Couleur de texte plus foncée pour l'onglet actif */
+            background-color: #fff;
+            border-color: #dee2e6 #dee2e6 #fff;
+            border-bottom: 3px solid #3182ce; /* Bordure inférieure bleue pour l'onglet actif */
+            font-weight: 600; /* Texte plus gras pour l'onglet actif */
+        }
+        .tab-content {
+            padding: 1.5rem 0;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {% include 'navbar.html' %}
+
+    <main class="flex-grow-1 py-4">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <h1 class="text-center mb-4">Ajouter du contenu à la bibliothèque</h1>
+                    
+                    <!-- Navigation entre les onglets -->
+                    <ul class="nav nav-tabs mb-4" id="uploadTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="article-tab" data-bs-toggle="tab" data-bs-target="#article-form" type="button" role="tab" aria-controls="article" aria-selected="true">
+                                <i class="far fa-newspaper me-2 "></i><i class="text-dark">Article</i>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="book-tab" data-bs-toggle="tab" data-bs-target="#book-form" type="button" role="tab" aria-controls="book" aria-selected="false">
+                                <i class="fas fa-book me-2 "></i><i class="text-dark">Livre</i>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Messages d'alerte -->
+                    <div id="alertContainer"></div>
+
+                    <!-- Contenu des onglets -->
+                    <div class="tab-content" id="uploadTabsContent">
+                        <!-- Formulaire Article -->
+                        <div class="tab-pane fade show active" id="article-form" role="tabpanel" aria-labelledby="article-tab">
+                            <div class="form-container">
+                                <div class="form-header">
+                                    <h2><i class="far fa-newspaper me-2"></i>Nouvel article</h2>
+                                    <p class="text-muted mb-0">Remplissez les champs pour ajouter un nouvel article</p>
+                                </div>
+                                
+                                <form id="articleForm" method="post" enctype="multipart/form-data" data-url="{% url 'librairy:upload_article' %}">
+                                    {% csrf_token %}
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="{{ article_form.title.id_for_label }}" class="form-label">Titre *</label>
+                                                {{ article_form.title }}
+                                                <div class="invalid-feedback" id="titleError"></div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="{{ article_form.content.id_for_label }}" class="form-label">Contenu *</label>
+                                                {{ article_form.content }}
+                                                <div class="invalid-feedback" id="contentError"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="{{ article_form.image.id_for_label }}" class="form-label">Image de couverture</label>
+                                                <div class="custom-file">
+                                                    {{ article_form.image }}
+                                                    <label class="custom-file-label" for="{{ article_form.image.id_for_label }}" id="articleImageLabel">Choisir une image...</label>
+                                                </div>
+                                                <div class="invalid-feedback" id="imageError"></div>
+                                                <img id="previewArticleImage" class="img-fluid mt-2" alt="Aperçu de l'image">
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="{{ article_form.files.id_for_label }}" class="form-label">Fichier joint (PDF, DOC, etc.)</label>
+                                                <div class="custom-file">
+                                                    {{ article_form.files }}
+                                                    <label class="custom-file-label" for="{{ article_form.files.id_for_label }}" id="articleFileLabel">Choisir un fichier...</label>
+                                                </div>
+                                                <div class="file-info" id="articleFileInfo"></div>
+                                                <div class="invalid-feedback" id="fileError"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                        <button type="reset" class="btn btn-outline-secondary me-md-2">Réinitialiser</button>
+                                        <button type="submit" class="btn btn-primary" id="submitArticle">
+                                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="articleSpinner"></span>
+                                            <span id="articleBtnText">Publier l'article</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- Formulaire Livre -->
+                        <div class="tab-pane fade" id="book-form" role="tabpanel" aria-labelledby="book-tab">
+                            <div class="form-container">
+                                <div class="form-header">
+                                    <h2><i class="fas fa-book me-2"></i>Nouveau livre</h2>
+                                    <p class="text-muted mb-0">Ajoutez un nouveau livre à la bibliothèque</p>
+                                </div>
+                                
+                                <form id="bookForm" method="post" enctype="multipart/form-data" data-url="{% url 'librairy:upload_book' %}">
+                                    {% csrf_token %}
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="{{ book_form.title.id_for_label }}" class="form-label">Titre *</label>
+                                                {{ book_form.title }}
+                                                <div class="invalid-feedback" id="bookTitleError"></div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="{{ book_form.author.id_for_label }}" class="form-label">Auteur *</label>
+                                                {{ book_form.author }}
+                                                <div class="invalid-feedback" id="authorError"></div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="{{ book_form.description.id_for_label }}" class="form-label">Description</label>
+                                                {{ book_form.description }}
+                                                <div class="invalid-feedback" id="descriptionError"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="{{ book_form.image.id_for_label }}" class="form-label">Couverture du livre</label>
+                                                <div class="custom-file">
+                                                    {{ book_form.image }}
+                                                    <label class="custom-file-label" for="{{ book_form.image.id_for_label }}" id="bookImageLabel">Choisir une image de couverture...</label>
+                                                </div>
+                                                <div class="invalid-feedback" id="bookImageError"></div>
+                                                <img id="previewBookImage" class="img-fluid mt-2" alt="Aperçu de la couverture">
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="{{ book_form.files.id_for_label }}" class="form-label">Fichier du livre *</label>
+                                                <div class="custom-file">
+                                                    {{ book_form.files }}
+                                                    <label class="custom-file-label" for="{{ book_form.files.id_for_label }}" id="bookFileLabel">Choisir un fichier (PDF, EPUB, etc.)...</label>
+                                                </div>
+                                                <div class="file-info" id="bookFileInfo"></div>
+                                                <div class="invalid-feedback" id="bookFileError"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                        <button type="reset" class="btn btn-outline-secondary me-md-2">Réinitialiser</button>
+                                        <button type="submit" class="btn btn-primary" id="submitBook">
+                                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="bookSpinner"></span>
+                                            <span id="bookBtnText">Ajouter le livre</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+
+    <!-- Scripts JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fonction pour afficher les messages d'alerte
+        function showAlert(message, type = 'success') {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            $('#alertContainer').html(alertHtml);
+            
+            // Masquer l'alerte après 5 secondes
+            setTimeout(() => {
+                $('.alert').alert('close');
+            }, 5000);
+        }
+
+        // Gestion de la prévisualisation des images
+        function readURL(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    $(`#${previewId}`).attr('src', e.target.result).show();
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+                $(`#${previewId}`).show();
+            }
+        }
+
+        // Gestion du changement de fichier pour l'image de l'article
+        $('#{{ article_form.image.id_for_label }}').change(function() {
+            const fileName = $(this).val().split('\\').pop();
+            $('#articleImageLabel').text(fileName || 'Choisir une image...');
+            readURL(this, 'previewArticleImage');
+        });
+
+        // Gestion du changement de fichier pour l'image du livre
+        $('#{{ book_form.image.id_for_label }}').change(function() {
+            const fileName = $(this).val().split('\\').pop();
+            $('#bookImageLabel').text(fileName || 'Choisir une image de couverture...');
+            readURL(this, 'previewBookImage');
+        });
+
+        // Gestion du changement de fichier pour le fichier de l'article
+        $('#{{ article_form.files.id_for_label }}').change(function() {
+            const file = this.files[0];
+            if (file) {
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Taille en Mo
+                $('#articleFileLabel').text(file.name);
+                $('#articleFileInfo').html(`
+                    <i class="fas fa-file me-1"></i>${file.name}<br>
+                    <small>Taille: ${fileSize} Mo - Type: ${file.type || 'Inconnu'}</small>
+                `);
+            } else {
+                $('#articleFileLabel').text('Choisir un fichier...');
+                $('#articleFileInfo').empty();
+            }
+        });
+
+        // Gestion du changement de fichier pour le fichier du livre
+        $('#{{ book_form.files.id_for_label }}').change(function() {
+            const file = this.files[0];
+            if (file) {
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Taille en Mo
+                $('#bookFileLabel').text(file.name);
+                $('#bookFileInfo').html(`
+                    <i class="fas fa-file me-1"></i>${file.name}<br>
+                    <small>Taille: ${fileSize} Mo - Type: ${file.type || 'Inconnu'}</small>
+                `);
+            } else {
+                $('#bookFileLabel').text('Choisir un fichier (PDF, EPUB, etc.)...');
+                $('#bookFileInfo').empty();
+            }
+        });
+
+        // Soumission du formulaire d'article
+        $('#articleForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const form = $(this);
+            const formData = new FormData(this);
+            const submitBtn = $('#submitArticle');
+            const spinner = $('#articleSpinner');
+            const btnText = $('#articleBtnText');
+            
+            // Réinitialiser les messages d'erreur
+            $('.is-invalid').removeClass('is-invalid');
+            $('.invalid-feedback').text('');
+            
+            // Désactiver le bouton et afficher le spinner
+            submitBtn.prop('disabled', true);
+            spinner.removeClass('d-none');
+            btnText.text('Publication en cours...');
+            
+            // Envoyer la requête AJAX
+            $.ajax({
+                url: form.data('url'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        // Afficher le message de succès
+                        showAlert(response.message, 'success');
+                        
+                        // Réinitialiser le formulaire
+                        form.trigger('reset');
+                        $('#previewArticleImage').hide();
+                        $('#articleFileInfo').empty();
+                        
+                        // Mettre à jour la liste des articles si nécessaire
+                        // Par exemple, rediriger vers la page de l'article
+                        window.location.href = `/librairy/article/${response.article.id}/`;
+                    }
+                },
+                error: function(xhr) {
+                    const response = xhr.responseJSON;
+                    
+                    if (response && response.errors) {
+                        // Afficher les erreurs de validation
+                        for (const field in response.errors) {
+                            const errorMessage = response.errors[field][0];
+                            $(`#${field}Error`).text(errorMessage);
+                            $(`#id_${field}`).addClass('is-invalid');
+                        }
+                        
+                        showAlert('Veuillez corriger les erreurs dans le formulaire.', 'danger');
+                    } else {
+                        showAlert('Une erreur est survenue lors de la publication de l\'article.', 'danger');
+                    }
+                },
+                complete: function() {
+                    // Réactiver le bouton et masquer le spinner
+                    submitBtn.prop('disabled', false);
+                    spinner.addClass('d-none');
+                    btnText.text('Publier l\'article');
+                }
+            });
+        });
+        
+        // Soumission du formulaire de livre (similaire au formulaire d'article)
+        $('#bookForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const form = $(this);
+            const formData = new FormData(this);
+            const submitBtn = $('#submitBook');
+            const spinner = $('#bookSpinner');
+            const btnText = $('#bookBtnText');
+            
+            // Réinitialiser les messages d'erreur
+            $('.is-invalid').removeClass('is-invalid');
+            $('.invalid-feedback').text('');
+            
+            // Désactiver le bouton et afficher le spinner
+            submitBtn.prop('disabled', true);
+            spinner.removeClass('d-none');
+            btnText.text('Ajout en cours...');
+            
+            // Envoyer la requête AJAX
+            $.ajax({
+                url: form.data('url'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        // Afficher le message de succès
+                        showAlert(response.message, 'success');
+                        
+                        // Réinitialiser le formulaire
+                        form.trigger('reset');
+                        $('#previewBookImage').hide();
+                        $('#bookFileInfo').empty();
+                        
+                        // Mettre à jour la liste des livres si nécessaire
+                        // Par exemple, recharger la page
+                        setTimeout(() => {
+                            window.location.href = '/librairy/';
+                        }, 1500);
+                    }
+                },
+                error: function(xhr) {
+                    const response = xhr.responseJSON;
+                    
+                    if (response && response.errors) {
+                        // Afficher les erreurs de validation
+                        for (const field in response.errors) {
+                            const errorMessage = response.errors[field][0];
+                            $(`#book${field.charAt(0).toUpperCase() + field.slice(1)}Error`).text(errorMessage);
+                            $(`#id_${field}`).addClass('is-invalid');
+                        }
+                        
+                        showAlert('Veuillez corriger les erreurs dans le formulaire.', 'danger');
+                    } else {
+                        showAlert('Une erreur est survenue lors de l\'ajout du livre.', 'danger');
+                    }
+                },
+                complete: function() {
+                    // Réactiver le bouton et masquer le spinner
+                    submitBtn.prop('disabled', false);
+                    spinner.addClass('d-none');
+                    btnText.text('Ajouter le livre');
+                }
+            });
+        });
+        
+        // Initialisation des tooltips Bootstrap
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip()
+        });
+    </script>
+</body>
+</html>

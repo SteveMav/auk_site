@@ -1,0 +1,30 @@
+<div class="col-md-6 col-lg-4 mb-4">
+    <div class="card h-100 shadow-sm">
+        {% if book.image %}
+        <img src="{{ book.image.url }}" class="card-img-top" alt="{{ book.title }}" style="height: 300px; object-fit: contain; padding: 1rem;">
+        {% else %}
+        <div class="text-center py-5 bg-light">
+            <i class="fas fa-book fa-5x text-muted"></i>
+        </div>
+        {% endif %}
+        <div class="card-body">
+            <h5 class="card-title">{{ book.title }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
+            {% if book.description %}
+            <p class="card-text">
+                {{ book.description|truncatewords:20 }}
+            </p>
+            {% endif %}
+        </div>
+        <div class="card-footer bg-transparent">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ book.files.url }}" class="btn btn-primary btn-sm" target="_blank">
+                    <i class="fas fa-download me-1"></i> Télécharger
+                </a>
+                <small class="text-muted">
+                    {{ book.date_published|date:"d/m/Y" }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
