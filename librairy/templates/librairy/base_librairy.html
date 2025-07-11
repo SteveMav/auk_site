@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliothèque - AUK</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/logo-auk.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {% if messages %}
+    <div id="toast-container" style="position: fixed; top: 30px; right: 30px; z-index: 9999;">
+        {% for message in messages %}
+        <div class="toast-message alert alert-{{ message.tags }} shadow-sm mb-2 animate__animated animate__fadeInDown">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            const toasts = document.querySelectorAll('.toast-message');
+            if (toasts.length > 0) {
+                setTimeout(() => {
+                    toasts.forEach(t => t.style.opacity = '0');
+                    setTimeout(() => {
+                        const container = document.getElementById('toast-container');
+                        if (container) container.remove();
+                    }, 500);
+                }, 1000);
+            }
+        });
+    </script>
+
+    {% include 'navbar.html' %}
+
+    <main class="flex-grow-1">
+        <div class="container my-4">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="text-center mb-4">Bibliothèque AUK</h1>
+                    
+                    <!-- Navigation entre les onglets -->
+                    <ul class="nav nav-tabs mb-4" id="libraryTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="articles-tab" data-bs-toggle="tab" data-bs-target="#articles" type="button" role="tab" aria-controls="articles" aria-selected="true">
+                                Articles
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="books-tab" data-bs-toggle="tab" data-bs-target="#books" type="button" role="tab" aria-controls="books" aria-selected="false">
+                                Livres
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Contenu des onglets -->
+                    <div class="tab-content" id="libraryTabsContent">
+                        <!-- Onglet Articles -->
+                        <div class="tab-pane fade show active" id="articles" role="tabpanel" aria-labelledby="articles-tab">
+                            <div class="row">
+                                {% for article in articles %}
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100 shadow-sm">
+                                        {% if article.image %}
+                                        <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.title }}" style="height: 200px; object-fit: cover;">
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ article.title }}</h5>
+                                            <p class="card-text text-muted small">
+                                                Par {{ article.author.get_full_name|default:article.author.username }}
+                                                <br>
+                                                {{ article.created_date|date:"d F Y" }}
+                                            </p>
+                                            <p class="card-text">
+                                                {{ article.content|truncatewords:30 }}
+                                            </p>
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <a href="{% url 'librairy:article_detail' article.id %}" class="btn btn-outline-primary btn-sm">Lire la suite</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        Aucun article disponible pour le moment.
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Onglet Livres -->
+                        <div class="tab-pane fade" id="books" role="tabpanel" aria-labelledby="books-tab">
+                            <div class="row">
+                                {% for book in books %}
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100 shadow-sm">
+                                        {% if book.image %}
+                                        <img src="{{ book.image.url }}" class="card-img-top" alt="{{ book.title }}" style="height: 300px; object-fit: contain; padding: 1rem;">
+                                        {% else %}
+                                        <div class="text-center py-5 bg-light">
+                                            <i class="fas fa-book fa-5x text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ book.title }}</h5>
+                                            <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
+                                            {% if book.description %}
+                                            <p class="card-text">
+                                                {{ book.description|truncatewords:20 }}
+                                            </p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="card-footer bg-transparent">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <a href="{{ book.files.url }}" class="btn btn-primary btn-sm" target="_blank">
+                                                    <i class="fas fa-download me-1"></i> Télécharger
+                                                </a>
+                                                <small class="text-muted">
+                                                    {{ book.date_published|date:"d/m/Y" }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        Aucun livre disponible pour le moment.
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+
+    <!-- Scripts JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+</html>

@@ -25,5 +25,6 @@ urlpatterns = [
     path('event_news/', include('event_news.urls')),
     path('task/', include('task.urls')),
     path('schedule/', include('schedule.urls')),
+    path('librairy/', include('librairy.urls')),  # Ajout des URLs de la librairie
     path('', include('main.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
