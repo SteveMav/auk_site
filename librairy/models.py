@@ -13,6 +13,10 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+        
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('librairy:article_detail', args=[str(self.id)])
 
 class Books(models.Model):
     title = models.CharField(max_length=200)
@@ -25,6 +29,10 @@ class Books(models.Model):
     
     def __str__(self):
         return self.title
+        
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('librairy:book_detail', args=[str(self.id)])
 
     
 

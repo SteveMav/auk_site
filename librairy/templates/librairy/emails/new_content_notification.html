@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Nouveau {{ content_type }} publié - AUK</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .content-box {
+            background: rgba(255,255,255,0.97);
+            border-radius: 1rem;
+            box-shadow: 0 6px 36px rgba(0,0,0,0.07);
+            margin: 1rem auto;
+            padding: 2.5rem 2rem;
+        }
+        .item-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: block;
+        }
+        .us-ribbon {
+            background: repeating-linear-gradient(90deg, #bf0a30, #bf0a30 10px, #fff 10px, #fff 20px, #002868 20px, #002868 30px);
+            height: 6px;
+            border-radius: 3px;
+            margin: 0 auto 1.5rem auto;
+            width: 120px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="us-ribbon"></div>
+        <div class="content-box">
+            <h2>Nouveau {{ content_type }} publié sur AUK</h2>
+            
+            <p>Bonjour,</p>
+            
+            <p>Un nouveau {{ content_type }} vient d'être publié sur la plateforme AUK :</p>
+            
+            <h3 style="color: #007bff;">{{ title }}</h3>
+            
+            {% if has_image %}
+                <div style="text-align: center; margin: 20px 0;">
+                    <img src="cid:content_image" alt="{{ title }}" style="max-width: 100%; max-height: 300px; border-radius: 8px; margin: 0 auto; display: block;">
+                </div>
+            {% endif %}
+            
+            {% if description %}
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                    <p style="margin: 0;">{{ description|truncatechars:200 }}</p>
+                </div>
+            {% endif %}
+            
+            <p><strong>Publié par :</strong> {{ author_name }}</p>
+            <p><strong>Date de publication :</strong> {{ created_date|date:"d F Y" }}</p>
+            
+            <div style="text-align: center; margin: 25px 0;">
+                <a href="{{ absolute_url }}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                    Voir le {{ content_type }}
+                </a>
+            </div>
+            
+            <div class="footer">
+                <p>Si vous ne souhaitez plus recevoir ces notifications, vous pouvez mettre à jour vos préférences dans votre compte.</p>
+                <p>Merci de votre attention,<br>L'équipe AUK</p>
+            </div>
+        </div>
+        
+        <footer class="footer" style="text-align: center; color: #666; font-size: 0.9em; margin-top: 20px;">
+            <div>Contact : info@auketudiant.com | +243 900 824 429</div>
+            <div>&copy; {% now "Y" %} Coordination estudiantine AUK. Tous droits réservés.</div>
+        </footer>
+    </div>
+</body>
+</html>

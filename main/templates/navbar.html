@@ -57,8 +57,17 @@
                 <li class="nav-item"><a class="nav-link" href="/event_news/">News</a></li>
                 {% endif %}
                 {% if user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'librairy:library_home' %}">Bibliothèque</a></li>
-                
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="libraryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Bibliothèque
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="libraryDropdown">
+                        <li><a class="dropdown-item" href="{% url 'librairy:library_home' %}">Voir les articles</a></li>
+                        {% if perms.librairy.add_article or perms.librairy.add_book %}
+                        <li><a class="dropdown-item" href="{% url 'librairy:upload_content' %}">Ajouter un article ou un livre</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
                 {% if perms.schedule.add_work %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="workDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
